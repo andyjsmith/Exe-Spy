@@ -34,7 +34,7 @@ class HeadersView(QtWidgets.QScrollArea):
     def load(self, pe_obj: pe_file.PEFile):
 
         # DOS Header
-        self.dos_header_group.table.set_contents([
+        self.dos_header_group.view.setModel(table.TableModel([
             ("e_magic", "Magic number", hex(pe_obj.pe.DOS_HEADER.e_magic)),
             ("e_cblp", "Bytes on last page of file",
              hex(pe_obj.pe.DOS_HEADER.e_cblp)),
@@ -64,10 +64,10 @@ class HeadersView(QtWidgets.QScrollArea):
                 pe_obj.pe.DOS_HEADER.e_res2, "big"))),
             ("e_lfanew", "File address of new exe header",
              hex(pe_obj.pe.DOS_HEADER.e_lfanew))
-        ])
+        ], headers=["Name", "Description", "Value"]))
 
         # COFF File Header
-        self.file_header_group.table.set_contents([
+        self.file_header_group.view.setModel(table.TableModel([
             ("Machine",
              f"{hex(pe_obj.pe.FILE_HEADER.Machine)} ({pe_obj.architecture()})"),
             ("NumberOfSections", str(pe_obj.pe.FILE_HEADER.NumberOfSections)),
@@ -78,7 +78,7 @@ class HeadersView(QtWidgets.QScrollArea):
             ("SizeOfOptionalHeader", hex(pe_obj.pe.FILE_HEADER.SizeOfOptionalHeader)),
             ("Characteristics",
              f"{hex(pe_obj.pe.FILE_HEADER.Characteristics)} ({pe_obj.characteristics_str()})"),
-        ])
+        ], headers=["Name", "Value"]))
 
         # Optional Header
         base_of_data = []
@@ -88,7 +88,7 @@ class HeadersView(QtWidgets.QScrollArea):
         except AttributeError:
             pass
 
-        self.optional_header_group.table.set_contents([
+        self.optional_header_group.view.setModel(table.TableModel([
             ("Magic",
              f"{hex(pe_obj.pe.OPTIONAL_HEADER.Magic)} ({pe_obj.pe_format()})"),
             ("MajorLinkerVersion", str(pe_obj.pe.OPTIONAL_HEADER.MajorLinkerVersion)),
@@ -130,4 +130,4 @@ class HeadersView(QtWidgets.QScrollArea):
             ("SizeOfHeapCommit", hex(pe_obj.pe.OPTIONAL_HEADER.SizeOfHeapCommit)),
             ("LoaderFlags", hex(pe_obj.pe.OPTIONAL_HEADER.LoaderFlags)),
             ("NumberOfRvaAndSizes", str(pe_obj.pe.OPTIONAL_HEADER.NumberOfRvaAndSizes)),
-        ])
+        ], headers=["Name", "Value"]))

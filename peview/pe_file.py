@@ -71,6 +71,7 @@ class PEFile:
             return("PE+")
         return "unknown"
 
+    # TODO: this is slow, maybe do in another thread?
     def strings(self, min_length=10) -> "list[str]":
         chars = bytes("".join([chr(i) for i in range(32, 127)]), "ascii")
 

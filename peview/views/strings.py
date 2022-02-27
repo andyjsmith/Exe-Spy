@@ -1,3 +1,4 @@
+from email import header
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtGui as QtGui
 import PySide6.QtCore as QtCore
@@ -36,33 +37,38 @@ class StringsView(QtWidgets.QWidget):
         self.search_minimum = QtWidgets.QSpinBox()
         self.search_minimum.setMinimum(1)
         self.search_minimum.setMaximum(100000000)
-        self.search_minimum.setValue(4)
+        self.search_minimum.setValue(8)
         self.search_minimum.valueChanged.connect(self.handle_minimum_change)
         self.controls_widget.layout().addWidget(self.search_minimum)
 
         self.layout().addWidget(self.controls_widget)
 
-        self.table = table.Table(
-            fit_columns=True, fit_to_contents=False, headers=["String", "Offset"])
-        self.table.setSortingEnabled(True)
-        self.layout().addWidget(self.table)
+        self.table_view = table.TableView(
+            fit_columns=False, fit_to_contents=False, headers=["String", "Offset"], first_column_scale=1.2)
+        self.table_view.setSortingEnabled(True)
+
+        self.layout().addWidget(self.table_view)
 
     def load(self, pe_obj: pe_file.PEFile):
         self.pe = pe_obj
-        self.table.set_contents(pe_obj.strings(
-            min_length=self.search_minimum.value()), hex_columns=[1])
+        self.table_model = table.TableModel(pe_obj.strings(
+            min_length=self.search_minimum.value()), headers=["String", "Offset"], hex_columns=[1])
+        self.table_proxy = QtCore.QSortFilterProxyModel()
+        self.table_proxy.setSourceModel(self.table_model)
+        self.table_proxy.setSortRole(QtCore.Qt.UserRole)
+        self.table_proxy.setFilterKeyColumn(0)
+        self.table_proxy.setSortCaseSensitivity(QtCore.Qt.CaseInsensitive)
+        self.table_view.setModel(self.table_proxy)
+        self.table_view.fit_contents()
+        self.handle_case_sensitive_change()
 
     def handle_search_change(self):
         search_text = self.search_box.text()
-        for row in range(self.table.rowCount()):
-            if self.case_sensitive.isChecked():
-                self.table.setRowHidden(
-                    row, search_text not in self.table.item(row, 0).text())
-            else:
-                self.table.setRowHidden(
-                    row, search_text.lower() not in self.table.item(row, 0).text().lower())
 
-        if len([x for x in range(self.table.rowCount()) if not self.table.isRowHidden(x)]) == 0:
+        self.table_proxy.setFilterFixedString(search_text)
+        self.table_view.resizeRowsToContents()
+
+        if self.table_proxy.rowCount() == 0:
             palette = QtGui.QPalette()
             palette.setColor(QtGui.QPalette.Base, QtGui.QColor(255, 150, 150))
             self.search_box.setPalette(palette)
@@ -71,6 +77,11 @@ class StringsView(QtWidgets.QWidget):
             self.search_box.setPalette(palette)
 
     def handle_case_sensitive_change(self):
+        if self.case_sensitive.isChecked():
+            self.table_proxy.setFilterCaseSensitivity(QtCore.Qt.CaseSensitive)
+        else:
+            self.table_proxy.setFilterCaseSensitivity(
+                QtCore.Qt.CaseInsensitive)
         self.handle_search_change()
 
     def handle_minimum_change(self):
