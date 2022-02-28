@@ -73,14 +73,13 @@ class PEFile:
 
     # TODO: this is slow, maybe do in another thread?
     def strings(self, min_length=10) -> "list[str]":
-        chars = bytes("".join([chr(i) for i in range(32, 127)]), "ascii")
-
         strings = []
         with open(self.path, "rb") as f:
             current_string = b""
             byte = f.read(1)
+
             while byte:
-                if byte in chars:
+                if b" " <= byte <= b"~":
                     current_string += byte
                 else:
                     if len(current_string) >= min_length:
@@ -88,6 +87,7 @@ class PEFile:
                             "ascii"), f.tell() - len(current_string) - 1))
                     current_string = b""
                 byte = f.read(1)
+
             if len(current_string) >= min_length:
                 strings.append((current_string.decode("ascii"),
                                 f.tell() - len(current_string)))
