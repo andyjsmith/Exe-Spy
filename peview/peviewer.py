@@ -1,3 +1,4 @@
+import os
 import sys
 
 import PySide6.QtGui as QtGui
@@ -148,6 +149,9 @@ class PEViewer(QtWidgets.QMainWindow):
         except pefile.PEFormatError:
             helpers.show_message_box(
                 "Not a valid PE file", alert_type=helpers.MessageBoxTypes.CRITICAL)
+        except FileNotFoundError:
+            helpers.show_message_box(
+                "File not found", alert_type=helpers.MessageBoxTypes.CRITICAL)
         else:
             self.tabview.load(self.pe)
 

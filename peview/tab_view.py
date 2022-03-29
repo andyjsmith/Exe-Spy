@@ -7,7 +7,7 @@ import PySide6.QtGui as QtGui
 from . import pe_file
 from .views import view
 
-from .views import general, headers, strings
+from .views import general, headers, strings, hashes
 
 
 class TabBar(QtWidgets.QTabBar):
@@ -100,7 +100,7 @@ class TabView(QtWidgets.QTabWidget):
         self.tabs[Tabs.HEXVIEW] = QtWidgets.QWidget()
         self.addTab(self.tabs[Tabs.HEXVIEW], "Hex View")
 
-        self.tabs[Tabs.HASHES] = QtWidgets.QWidget()
+        self.tabs[Tabs.HASHES] = hashes.HashesView()
         self.addTab(self.tabs[Tabs.HASHES], "Hashes")
 
         self.tabs[Tabs.VIRUSTOTAL] = QtWidgets.QWidget()
