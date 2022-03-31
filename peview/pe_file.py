@@ -71,6 +71,16 @@ class PEFile:
             return("PE+")
         return "unknown"
 
+    def section_characteristics(self, section_num) -> "list[str]":
+        names = []
+        for name, val in pefile.section_characteristics:
+            if self.pe.sections[section_num].Characteristics & val:
+                names.append(name)
+        return names
+
+    def section_characteristics_str(self, section_num) -> str:
+        return ", ".join([c.replace("IMAGE_SCN_", "") for c in self.section_characteristics(section_num)])
+
     # TODO: this is slow, maybe do in another thread?
     def strings(self, min_length=10) -> "list[str]":
         strings = []

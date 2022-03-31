@@ -7,7 +7,7 @@ import PySide6.QtGui as QtGui
 from . import pe_file
 from .views import view
 
-from .views import general, headers, strings, hashes
+from .views import general, headers, strings, hashes, sections
 
 
 class TabBar(QtWidgets.QTabBar):
@@ -75,12 +75,12 @@ class TabView(QtWidgets.QTabWidget):
         self.tabs[Tabs.HEADERS] = headers.HeadersView()
         self.addTab(self.tabs[Tabs.HEADERS], "Headers")
 
-        self.tabs[Tabs.SECTIONS] = QtWidgets.QWidget()
+        self.tabs[Tabs.SECTIONS] = sections.SectionsView()
         self.addTab(self.tabs[Tabs.SECTIONS], "Sections")
         self.tabBar().setTabTextColor(self.indexOf(
             self.tabs[Tabs.SECTIONS]), QtGui.QColor(150, 150, 150))
-        self.tabBar().setTabEnabled(self.indexOf(
-            self.tabs[Tabs.SECTIONS]), False)
+        # self.tabBar().setTabEnabled(self.indexOf(
+        #     self.tabs[Tabs.SECTIONS]), False)
 
         self.tabs[Tabs.LIBRARIES] = QtWidgets.QWidget()
         self.addTab(self.tabs[Tabs.LIBRARIES], "Libraries")
