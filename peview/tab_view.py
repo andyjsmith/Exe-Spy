@@ -7,7 +7,7 @@ import PySide6.QtGui as QtGui
 from . import pe_file
 from .views import view
 
-from .views import general, headers, strings, hashes, sections
+from .views import general, headers, strings, hashes, sections, libraries, imports, exports, resources, hexview, virustotal
 
 
 class TabBar(QtWidgets.QTabBar):
@@ -82,28 +82,28 @@ class TabView(QtWidgets.QTabWidget):
         # self.tabBar().setTabEnabled(self.indexOf(
         #     self.tabs[Tabs.SECTIONS]), False)
 
-        self.tabs[Tabs.LIBRARIES] = QtWidgets.QWidget()
+        self.tabs[Tabs.LIBRARIES] = libraries.LibrariesView()
         self.addTab(self.tabs[Tabs.LIBRARIES], "Libraries")
 
-        self.tabs[Tabs.IMPORTS] = QtWidgets.QWidget()
+        self.tabs[Tabs.IMPORTS] = imports.ImportsView()
         self.addTab(self.tabs[Tabs.IMPORTS], "Imports")
 
-        self.tabs[Tabs.EXPORTS] = QtWidgets.QWidget()
+        self.tabs[Tabs.EXPORTS] = exports.ExportsView()
         self.addTab(self.tabs[Tabs.EXPORTS], "Exports")
 
-        self.tabs[Tabs.RESOURCES] = QtWidgets.QWidget()
+        self.tabs[Tabs.RESOURCES] = resources.ResourcesView()
         self.addTab(self.tabs[Tabs.RESOURCES], "Resources")
 
         self.tabs[Tabs.STRINGS] = strings.StringsView()
         self.addTab(self.tabs[Tabs.STRINGS], "Strings")
 
-        self.tabs[Tabs.HEXVIEW] = QtWidgets.QWidget()
+        self.tabs[Tabs.HEXVIEW] = hexview.HexView()
         self.addTab(self.tabs[Tabs.HEXVIEW], "Hex View")
 
         self.tabs[Tabs.HASHES] = hashes.HashesView()
         self.addTab(self.tabs[Tabs.HASHES], "Hashes")
 
-        self.tabs[Tabs.VIRUSTOTAL] = QtWidgets.QWidget()
+        self.tabs[Tabs.VIRUSTOTAL] = virustotal.VirusTotalView()
         self.addTab(self.tabs[Tabs.VIRUSTOTAL], "VirusTotal")
 
     def load(self, pe: pe_file.PEFile):

@@ -26,14 +26,14 @@ class HashesView(QtWidgets.QScrollArea):
         self.file_hashes_group.setFocus()
 
     def load(self, pe_obj: pe_file.PEFile):
-        hashes = self.calculate_hashes(pe_obj.path)
+        hashes = self.calculate_hashes(pe_obj.path, pe_obj)
 
         # File Hashes
         # TODO: CRC
         self.file_hashes_group.view.setModel(
             table.TableModel(hashes, headers=["Type", "Hash"]))
 
-    def calculate_hashes(self, filename) -> "list[tuple]":
+    def calculate_hashes(self, filename, pe_obj: pe_file.PEFile) -> "list[tuple]":
         """Calculate file hashes as a list of tuples."""
         hash_crc32 = crc32()
         hash_md5 = hashlib.md5()
@@ -81,7 +81,8 @@ class HashesView(QtWidgets.QScrollArea):
             ("SHA3-384", hash_sha3_384.hexdigest()),
             ("SHA3-512", hash_sha3_512.hexdigest()),
             ("BLAKE2s", hash_blake2s.hexdigest()),
-            ("BLAKE2b", hash_blake2b.hexdigest())
+            ("BLAKE2b", hash_blake2b.hexdigest()),
+            ("Imphash", pe_obj.pe.get_imphash())
         ]
 
 

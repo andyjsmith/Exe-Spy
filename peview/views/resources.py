@@ -3,7 +3,7 @@ import PySide6.QtWidgets as QtWidgets
 from .. import pe_file
 
 
-class View(QtWidgets.QWidget):
+class ResourcesView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

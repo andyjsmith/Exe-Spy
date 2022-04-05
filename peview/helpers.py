@@ -8,15 +8,15 @@ import pefile
 import PySide6.QtWidgets as QtWidgets
 
 
-APP_NAME = "PE Viewer"
-APP_NAME_SHORT = "peviewer"
+APP_NAME = "Exe Spy"
+APP_NAME_SHORT = "exespy"
 VERSION = (1, 0, 0)
 ORGANIZATION_NAME = "Andy Smith"
 ORGANIZATION_DOMAIN = "ajsmith.us"
 ABOUT_TEXT = f"""\
 {APP_NAME}
 {".".join(str(i) for i in VERSION)}
-Copyright (C) 2021 Andy Smith
+Copyright (C) 2022 Andy Smith
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
