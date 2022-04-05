@@ -23,7 +23,10 @@ except (AttributeError, OSError):
 
 
 class ExeSpy(QtWidgets.QMainWindow):
+    """Main window"""
+
     def __init__(self):
+        """Initialize the application"""
         super().__init__()
 
         self.app = QtWidgets.QApplication.instance()
@@ -91,6 +94,7 @@ class ExeSpy(QtWidgets.QMainWindow):
         self.statusBar().setStyleSheet(
             "QStatusBar QLabel { border-color: lightgray; border-style: solid; border-width: 0 1px 0 0; }")
 
+        # Create a container for the tab view
         tab_container = QtWidgets.QWidget()
         tab_container_layout = QtWidgets.QVBoxLayout(tab_container)
         tab_container_layout.setContentsMargins(0, 0, 0, 0)
@@ -109,10 +113,12 @@ class ExeSpy(QtWidgets.QMainWindow):
         self.statusBar().addPermanentWidget(self.progress_bar)
 
     def show_about(self):
+        """Show the about dialog"""
         QtWidgets.QMessageBox().about(
             self, f"About {helpers.APP_NAME}", helpers.ABOUT_TEXT)
 
     def show_licenses(self):
+        """Show the third-party license dialog"""
         license = license_dialog.LicenseDialog(self)
         license.exec()
 
@@ -130,6 +136,7 @@ class ExeSpy(QtWidgets.QMainWindow):
         self.statusBar().clearMessage()
 
     def toggle_style(self):
+        """Toggle the application style between native and fusion"""
         if self.native_style_action.isChecked():
             self.app.setStyle(self.initial_style)
             self.settings.setValue("view/native_style", True)
@@ -157,6 +164,7 @@ class ExeSpy(QtWidgets.QMainWindow):
 
 
 def main():
+    """Main entry point"""
     app = QtWidgets.QApplication(sys.argv)
     # app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
 

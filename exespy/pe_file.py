@@ -5,7 +5,13 @@ import lief
 
 
 class PEFile:
+    """Base class for representing a PE file"""
+
     def __init__(self, path: str):
+        """
+        Initialize the PEFile object
+        :param path: Path to the PE file
+        """
         self.path = path
         self.name = os.path.basename(path)
         self.stat = os.stat(path)
@@ -15,6 +21,7 @@ class PEFile:
         self.calculated_checksum = self.pe.generate_checksum()
 
     def type(self) -> str:
+        """Return the type of the PE file (PE/DLL/etc)"""
         if self.pe.is_dll():
             return "DLL"
         elif self.pe.is_driver():
@@ -25,12 +32,15 @@ class PEFile:
             return "Unknown"
 
     def architecture(self) -> str:
+        """Return the architecture of the PE file"""
         return pefile.MACHINE_TYPE[self.pe.FILE_HEADER.Machine].replace("IMAGE_FILE_MACHINE_", "")
 
     def subsystem(self) -> str:
+        """Return the subsystem of the PE file"""
         return pefile.SUBSYSTEM_TYPE[self.pe.OPTIONAL_HEADER.Subsystem].replace("IMAGE_SUBSYSTEM_", "")
 
     def verify_signature(self) -> str:
+        """Verify the PE file's signature"""
         sig = self.lief_obj.verify_signature()
         if sig == lief.PE.Signature.VERIFICATION_FLAGS.OK:
             return "Verified"
@@ -39,12 +49,14 @@ class PEFile:
         return "Invalid"
 
     def verify_checksum(self) -> str:
+        """Verify the PE file's checksum"""
         if self.pe.OPTIONAL_HEADER.CheckSum == self.calculated_checksum:
             return "Valid"
         else:
             return f"Invalid, should be {hex(self.calculated_checksum)}"
 
     def characteristics(self) -> "list[str]":
+        """Return a list of characteristics for the PE file"""
         names = []
         for name, val in pefile.image_characteristics:
             if self.pe.FILE_HEADER.Characteristics & val:
@@ -52,9 +64,11 @@ class PEFile:
         return names
 
     def characteristics_str(self) -> str:
+        """Convert the characteristics to a readable string"""
         return ", ".join([c.replace("IMAGE_FILE_", "") for c in self.characteristics()])
 
     def dll_characteristics(self) -> "list[str]":
+        """Return a list of DLL characteristics for the PE file"""
         names = []
         for name, val in pefile.dll_characteristics:
             if self.pe.OPTIONAL_HEADER.DllCharacteristics & val:
@@ -62,9 +76,11 @@ class PEFile:
         return names
 
     def dll_characteristics_str(self) -> str:
+        """Convert the DLL characteristics to a readable string"""
         return ", ".join([c.replace("IMAGE_DLLCHARACTERISTICS_", "").replace("IMAGE_LIBRARY_", "") for c in self.dll_characteristics()])
 
     def pe_format(self) -> str:
+        """Return the PE format of the PE file (PE or PE+)"""
         if self.pe.OPTIONAL_HEADER.Magic == pefile.OPTIONAL_HEADER_MAGIC_PE:
             return("PE")
         elif self.pe.OPTIONAL_HEADER.Magic == pefile.OPTIONAL_HEADER_MAGIC_PE_PLUS:
@@ -72,6 +88,7 @@ class PEFile:
         return "unknown"
 
     def section_characteristics(self, section_num) -> "list[str]":
+        """Return a list of characteristics for the section"""
         names = []
         for name, val in pefile.section_characteristics:
             if self.pe.sections[section_num].Characteristics & val:
@@ -79,10 +96,12 @@ class PEFile:
         return names
 
     def section_characteristics_str(self, section_num) -> str:
+        """Convert the section characteristics to a readable string"""
         return ", ".join([c.replace("IMAGE_SCN_", "") for c in self.section_characteristics(section_num)])
 
     # TODO: this is slow, maybe do in another thread?
     def strings(self, min_length=10) -> "list[str]":
+        """Return a list of strings from the PE file"""
         strings = []
         with open(self.path, "rb") as f:
             current_string = b""

@@ -4,6 +4,8 @@ from .. import pe_file
 
 
 class View(QtWidgets.QWidget):
+    """Base abstract class which other tab views inherit from"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

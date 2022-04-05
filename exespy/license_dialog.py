@@ -5,6 +5,8 @@ from . import helpers
 
 
 class LicenseDialog(QtWidgets.QDialog):
+    """Dialog for showing third-party licenses"""
+
     def __init__(self, *args):
         super().__init__(*args)
 

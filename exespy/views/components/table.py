@@ -18,6 +18,7 @@ class TableGroup(QtWidgets.QGroupBox):
 
 
 class TableModel(QtCore.QAbstractTableModel):
+    """Custom QAbstractTableModel for modeling a table"""
 
     def __init__(self, data, *args, headers=None, hex_columns=[], **kwargs) -> None:
         super(TableModel, self).__init__(*args, **kwargs)
@@ -62,6 +63,8 @@ class TableModel(QtCore.QAbstractTableModel):
 
 
 class TableView(QtWidgets.QTableView):
+    """Custom QTableView for displaying a table"""
+
     def __init__(self, *args, fit_columns=False, headers=None, fit_to_contents=True, first_column_scale=3, ** kwargs) -> None:
         super().__init__(*args, **kwargs)
 
