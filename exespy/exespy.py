@@ -22,7 +22,7 @@ except (AttributeError, OSError):
     pass
 
 
-class PEViewer(QtWidgets.QMainWindow):
+class ExeSpy(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
 
@@ -164,11 +164,11 @@ def main():
     app.setOrganizationDomain(helpers.ORGANIZATION_DOMAIN)
     app.setApplicationName(helpers.APP_NAME)
 
-    pe_viewer = PEViewer()
+    exe_spy = ExeSpy()
 
     app.setWindowIcon(QtGui.QIcon(helpers.resource_path("img/icon.ico")))
 
-    pe_viewer.show()
+    exe_spy.show()
 
     # Close the splash screen
     try:
@@ -180,7 +180,7 @@ def main():
     # Process command-line file(s)
     if len(sys.argv) > 1:
         for filename in sys.argv[1:]:
-            pe_viewer.load_pe(filename)
+            exe_spy.load_pe(filename)
 
     sys.exit(app.exec())
 

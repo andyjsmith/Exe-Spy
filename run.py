@@ -1,4 +1,4 @@
-import peview.peviewer
+import exespy.exespy
 
 if __name__ == "__main__":
-    peview.peviewer.main()
+    exespy.exespy.main()
