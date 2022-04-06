@@ -35,9 +35,35 @@ class PEFile:
         """Return the architecture of the PE file"""
         return pefile.MACHINE_TYPE[self.pe.FILE_HEADER.Machine].replace("IMAGE_FILE_MACHINE_", "")
 
+    def is_x86(self) -> bool:
+        """Return whether the PE file uses the x86 instruction set"""
+        return self.architecture() == "I386" or self.architecture() == "AMD64"
+
+    def is_32bit(self) -> bool:
+        """Return whether the PE file is 32-bit"""
+        return self.architecture() == "I386"
+
+    def is_64bit(self) -> bool:
+        """Return whether the PE file is 64-bit"""
+        return self.architecture() == "AMD64"
+
     def subsystem(self) -> str:
         """Return the subsystem of the PE file"""
         return pefile.SUBSYSTEM_TYPE[self.pe.OPTIONAL_HEADER.Subsystem].replace("IMAGE_SUBSYSTEM_", "")
+
+    def entrypoint(self) -> int:
+        """Return the entrypoint of the PE file"""
+        try:
+            return self.pe.OPTIONAL_HEADER.AddressOfEntryPoint
+        except AttributeError:
+            return 0
+
+    def image_base(self) -> int:
+        """Return the imagebase of the PE file"""
+        try:
+            return self.pe.OPTIONAL_HEADER.ImageBase
+        except AttributeError:
+            return 0
 
     def verify_signature(self) -> str:
         """Verify the PE file's signature"""
@@ -80,11 +106,11 @@ class PEFile:
         return ", ".join([c.replace("IMAGE_DLLCHARACTERISTICS_", "").replace("IMAGE_LIBRARY_", "") for c in self.dll_characteristics()])
 
     def pe_format(self) -> str:
-        """Return the PE format of the PE file (PE or PE+)"""
+        """Return the PE format of the PE file (PE32 or PE32+)"""
         if self.pe.OPTIONAL_HEADER.Magic == pefile.OPTIONAL_HEADER_MAGIC_PE:
-            return("PE")
+            return("PE32")
         elif self.pe.OPTIONAL_HEADER.Magic == pefile.OPTIONAL_HEADER_MAGIC_PE_PLUS:
-            return("PE+")
+            return("PE32+")
         return "unknown"
 
     def section_characteristics(self, section_num) -> "list[str]":

@@ -6,8 +6,7 @@ import PySide6.QtGui as QtGui
 
 from . import pe_file
 from .views import view
-
-from .views import general, headers, strings, hashes, sections, libraries, imports, exports, resources, hexview, virustotal
+from .views import general, headers, strings, hashes, sections, libraries, imports, exports, resources, hexview, virustotal, disassembly
 
 
 class TabBar(QtWidgets.QTabBar):
@@ -53,6 +52,8 @@ class Tabs(enum.Enum):
     STRINGS = enum.auto()
     HEXVIEW = enum.auto()
     HASHES = enum.auto()
+    DISASSEMBLY = enum.auto()
+    PACKERS = enum.auto()
     VIRUSTOTAL = enum.auto()
 
 
@@ -102,6 +103,12 @@ class TabView(QtWidgets.QTabWidget):
 
         self.tabs[Tabs.HASHES] = hashes.HashesView()
         self.addTab(self.tabs[Tabs.HASHES], "Hashes")
+
+        self.tabs[Tabs.DISASSEMBLY] = disassembly.DisassemblyView()
+        self.addTab(self.tabs[Tabs.DISASSEMBLY], "Disassembly")
+
+        self.tabs[Tabs.PACKERS] = QtWidgets.QWidget()
+        self.addTab(self.tabs[Tabs.PACKERS], "Packers")
 
         self.tabs[Tabs.VIRUSTOTAL] = virustotal.VirusTotalView()
         self.addTab(self.tabs[Tabs.VIRUSTOTAL], "VirusTotal")

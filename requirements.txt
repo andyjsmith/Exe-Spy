@@ -3,3 +3,5 @@ pefile
 lief
 humanize
 icoextract
+yara-python
+iced-x86

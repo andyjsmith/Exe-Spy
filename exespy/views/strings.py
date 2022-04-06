@@ -12,9 +12,9 @@ class StringsView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Set up scroll area
         self.setLayout(QtWidgets.QVBoxLayout())
 
+        # Set up top control bar
         self.controls_widget = QtWidgets.QWidget()
         self.controls_widget.setLayout(QtWidgets.QHBoxLayout())
         self.controls_widget.layout().setContentsMargins(0, 0, 0, 0)
@@ -43,6 +43,7 @@ class StringsView(QtWidgets.QWidget):
 
         self.layout().addWidget(self.controls_widget)
 
+        # Set up strings table
         self.table_view = table.TableView(
             fit_columns=False, fit_to_contents=False, headers=["String", "Offset"], first_column_scale=1.2)
         self.table_view.setSortingEnabled(True)
