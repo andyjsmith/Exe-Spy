@@ -48,15 +48,18 @@ class GeneralView(QtWidgets.QScrollArea):
     def load(self, pe_obj: pe_file.PEFile):
         self.file_name.setText(pe_obj.name)
 
-        icon = icoextract.IconExtractor(pe_obj.path).get_icon()
-        icon.seek(0)
-        icon_bytes = icon.read()
+        try:
+            icon = icoextract.IconExtractor(pe_obj.path).get_icon()
+            icon.seek(0)
+            icon_bytes = icon.read()
 
-        pixmap = QtGui.QPixmap()
-        pixmap.loadFromData(icon_bytes)
-        pixmap = pixmap.scaled(
-            48, 48, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
-        self.icon.setPixmap(pixmap)
+            pixmap = QtGui.QPixmap()
+            pixmap.loadFromData(icon_bytes)
+            pixmap = pixmap.scaled(
+                48, 48, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+            self.icon.setPixmap(pixmap)
+        except icoextract.IconExtractorError:
+            pass
 
         # File Metadata
         c_time = helpers.format_time(pe_obj.stat.st_ctime)
