@@ -5,6 +5,7 @@ import PySide6.QtCore as QtCore
 import iced_x86
 
 from .. import pe_file
+from .. import helpers
 
 
 class DisassemblyView(QtWidgets.QWidget):
@@ -29,6 +30,12 @@ class DisassemblyView(QtWidgets.QWidget):
         self.entrypoint_btn.setSizePolicy(
             QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
         self.controls_widget.layout().addWidget(self.entrypoint_btn)
+        self.controls_widget.layout().addStretch()
+
+        self.address_box = QtWidgets.QLineEdit()
+        self.address_box.setPlaceholderText("Go to address")
+        self.address_box.returnPressed.connect(self.handle_address_box_search)
+        self.controls_widget.layout().addWidget(self.address_box)
 
         self.controls_widget.layout().addStretch()
 
@@ -123,11 +130,59 @@ class DisassemblyView(QtWidgets.QWidget):
         if self.addresses is None or len(self.addresses) == 0:
             return
 
+        self.scroll_to_address(self.pe_obj.entrypoint())
+
+    def handle_address_box_search(self):
+        """Jump to the address in the address box."""
+        if self.addresses is None or len(self.addresses) == 0:
+            return
+
+        try:
+            address = int(self.address_box.text(), 16)
+        except ValueError:
+            helpers.show_message_box(
+                "The address you entered was invalid.",
+                alert_type=helpers.MessageBoxTypes.CRITICAL,
+                title="Invalid Address"
+            )
+            return
+
+        self.scroll_to_address(address)
+
+    def scroll_to_address(self, target_address: int):
+        """
+        Scroll to the given address in the disassembly view, or the closest address.
+        :param target_address: The address to scroll to, can be an address with or without the image base.
+        """
+        if self.addresses is None or len(self.addresses) == 0:
+            return
+
         # Find assembly line with entrypoint address
         # Need to find the address CLOSEST to the entrypoint address, since the exact address
         # may not be in the disassembly, only an address near it.
-        entrypoint_line = min(range(len(self.addresses)), key=lambda i: abs(
-            self.addresses[i]-(self.pe_obj.entrypoint()+self.pe_obj.image_base())))
+        closest_line = 0
+        closest_distance = 0xFFFFFFFFFFFFFFFF
+        closest_line_base = 0
+        closest_distance_base = 0xFFFFFFFFFFFFFFFF
+        for i, address in enumerate(self.addresses):
+            # Calculate distance without image base
+            distance = abs(address - target_address)
+            if distance <= closest_distance:
+                closest_distance = distance
+                closest_line = i
+
+            # Calculate distance with image base
+            distance_base = abs(
+                address - (target_address + self.pe_obj.image_base()))
+            if distance_base <= closest_distance_base:
+                closest_distance_base = distance_base
+                closest_line_base = i
+
+        # Use whichever is closer, the one with the image base or the one without it
+        if closest_distance < closest_distance_base:
+            entrypoint_line = closest_line
+        else:
+            entrypoint_line = closest_line_base
 
         # Scroll to and highlight the line
         cursor = self.text_edit.textCursor()

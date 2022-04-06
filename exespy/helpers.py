@@ -51,7 +51,7 @@ class MessageBoxTypes:
     QUESTION = (QtWidgets.QMessageBox.Question, "Question")
 
 
-def show_message_box(text, alert_type=MessageBoxTypes.INFORMATION, title=None):
+def show_message_box(text: str, alert_type: MessageBoxTypes = MessageBoxTypes.INFORMATION, title: str = None) -> int:
     msgbox = QtWidgets.QMessageBox()
     if title is None:
         msgbox.setWindowTitle(alert_type[1])
