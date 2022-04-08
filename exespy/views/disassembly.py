@@ -6,6 +6,7 @@ import iced_x86
 
 from .. import pe_file
 from .. import helpers
+from .components import textedit
 
 
 class DisassemblyView(QtWidgets.QWidget):
@@ -52,16 +53,7 @@ class DisassemblyView(QtWidgets.QWidget):
         self.layout().addWidget(self.controls_widget)
 
         # Set up disassembly text edit
-        self.text_edit = QtWidgets.QPlainTextEdit()
-        self.text_edit.setReadOnly(True)
-        # The following possibly improve the plaintextedit's performance
-        self.text_edit.setUndoRedoEnabled(False)
-        self.text_edit.setLineWrapMode(QtWidgets.QPlainTextEdit.NoWrap)
-        self.text_edit.setWordWrapMode(QtGui.QTextOption.NoWrap)
-
-        mono_font = QtGui.QFont(["Monospace", "Consolas", "Courier New"])
-        mono_font.setStyleHint(QtGui.QFont.TypeWriter)
-        self.text_edit.setFont(mono_font)
+        self.text_edit = textedit.MonoTextEdit()
         self.layout().addWidget(self.text_edit)
 
     def load(self, pe_obj: pe_file.PEFile):
