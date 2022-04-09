@@ -12,19 +12,31 @@ class HexView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.setLayout(QtWidgets.QHBoxLayout())
+        self.setLayout(QtWidgets.QGridLayout())
 
         self.address_panel = textedit.MonoTextEdit()
         self.hex_panel = textedit.MonoTextEdit()
         self.text_panel = textedit.MonoTextEdit()
-        self.layout().addWidget(self.address_panel)
-        self.layout().addWidget(self.hex_panel)
-        self.layout().addWidget(self.text_panel)
+        self.layout().addWidget(self.address_panel, 1, 0, 1, 1)
+        self.layout().addWidget(self.hex_panel, 1, 1, 1, 1)
+        self.layout().addWidget(self.text_panel, 1, 2, 1, 1)
 
-        test_contents = "\n".join(str(i) for i in range(0, 1000))
-        self.address_panel.setPlainText(test_contents)
-        self.hex_panel.setPlainText(test_contents)
-        self.text_panel.setPlainText(test_contents)
+        address_label = QtWidgets.QLabel("Offset")
+        address_label.setFont(self.address_panel.font())
+        self.layout().addWidget(address_label, 0, 0, 1, 1)
+
+        hex_label = QtWidgets.QLabel(
+            "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F")
+        hex_label.setFont(self.hex_panel.font())
+        hex_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.layout().addWidget(hex_label, 0, 1, 1, 1)
+
+        text_label = QtWidgets.QLabel("Decoded Text")
+        text_label.setFont(self.text_panel.font())
+        self.layout().addWidget(text_label, 0, 2, 1, 1)
+
+        self.hex_panel.selectionChanged.connect(self.hex_selection_changed)
+        self.text_panel.selectionChanged.connect(self.text_selection_changed)
 
         # Cross-connect all the valueChanged signals to the setValue slots so
         # that the panels scroll together
@@ -54,6 +66,15 @@ class HexView(QtWidgets.QWidget):
             QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         self.text_panel.setSizePolicy(
             QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+
+        # Make the panels inactive highlight color match the active color
+        palette_match_active_highlight = self.hex_panel.palette()
+        palette_match_active_highlight.setColor(QtGui.QPalette.Inactive, QtGui.QPalette.Highlight, palette_match_active_highlight.color(
+            QtGui.QPalette.Active, QtGui.QPalette.Highlight))
+        palette_match_active_highlight.setColor(QtGui.QPalette.Inactive, QtGui.QPalette.HighlightedText, palette_match_active_highlight.color(
+            QtGui.QPalette.Active, QtGui.QPalette.HighlightedText))
+        self.hex_panel.setPalette(palette_match_active_highlight)
+        self.text_panel.setPalette(palette_match_active_highlight)
 
     def load(self, pe_obj: pe_file.PEFile):
         self.pe_obj = pe_obj
@@ -110,3 +131,80 @@ class HexView(QtWidgets.QWidget):
                 ascii_string += "."
 
         return ascii_string
+
+    def hex_selection_changed(self):
+        """Select only by whole bytes in the hex panel"""
+        old_state = self.hex_panel.blockSignals(True)
+
+        text = self.hex_panel.toPlainText()
+
+        cursor = self.hex_panel.textCursor()
+
+        # Get selection start and end
+        start = cursor.selectionStart()
+        end = cursor.selectionEnd()
+
+        # Check if the selection is going forwards or backwards
+        selecting_forward = cursor.anchor() == start
+
+        # Format selection around whole bytes, rather than individual chars
+        # Adjust the selection start
+        try:
+            if text[start] == " ":
+                start += 1
+            elif text[start+1] == " ":
+                start -= 1
+            # Adjust the selection end
+            if text[end-1] == " ":
+                end -= 1
+            elif end == 1 or text[end-2] == " ":
+                end += 1
+        except IndexError:
+            # Ignore any IndexErrors from selecting at the start/end
+            pass
+
+        # Set the modified selection
+        if selecting_forward:
+            # Selection is in the forward direction
+            cursor.setPosition(start)
+            cursor.setPosition(end, QtGui.QTextCursor.KeepAnchor)
+        else:
+            # Selection is in the backward direction
+            cursor.setPosition(end)
+            cursor.setPosition(start, QtGui.QTextCursor.KeepAnchor)
+
+        self.hex_panel.setTextCursor(cursor)
+
+        self.hex_panel.blockSignals(old_state)
+
+    def text_selection_changed(self):
+        """Match selection from text panel to hex panel"""
+        old_state = self.hex_panel.blockSignals(True)
+
+        hex_cursor = self.hex_panel.textCursor()
+        text_cursor = self.text_panel.textCursor()
+
+        # Calculate corresponding positions using blocks
+        text_starting_position_in_block = text_cursor.selectionStart() - self.text_panel.document().findBlock(
+            text_cursor.selectionStart()).position()
+        text_starting_block = self.text_panel.document().findBlock(
+            text_cursor.selectionStart()).blockNumber()
+
+        text_ending_position_in_block = text_cursor.selectionEnd() - self.text_panel.document().findBlock(
+            text_cursor.selectionEnd()).position()
+        text_ending_block = self.text_panel.document().findBlock(
+            text_cursor.selectionEnd()).blockNumber()
+
+        hex_starting_block_pos = self.hex_panel.document(
+        ).findBlockByNumber(text_starting_block).position()
+        hex_cursor.setPosition(
+            hex_starting_block_pos + 3*text_starting_position_in_block)
+
+        hex_ending_block_pos = self.hex_panel.document(
+        ).findBlockByNumber(text_ending_block).position()
+        hex_cursor.setPosition(hex_ending_block_pos + 3*text_ending_position_in_block - 1,
+                               QtGui.QTextCursor.KeepAnchor)
+
+        self.hex_panel.setTextCursor(hex_cursor)
+
+        self.hex_panel.blockSignals(old_state)
