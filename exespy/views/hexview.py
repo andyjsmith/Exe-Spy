@@ -1,3 +1,4 @@
+import math
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtCore as QtCore
 import PySide6.QtGui as QtGui
@@ -176,6 +177,38 @@ class HexView(QtWidgets.QWidget):
         self.hex_panel.setTextCursor(cursor)
 
         self.hex_panel.blockSignals(old_state)
+
+        # Now, set the text selection to match the hex selection
+        # ------------------------------------------------------
+        old_state = self.text_panel.blockSignals(True)
+
+        hex_cursor = self.hex_panel.textCursor()
+        text_cursor = self.text_panel.textCursor()
+
+        # Calculate corresponding positions using blocks
+        hex_starting_position_in_block = hex_cursor.selectionStart() - self.hex_panel.document().findBlock(
+            hex_cursor.selectionStart()).position()
+        hex_starting_block = self.hex_panel.document().findBlock(
+            hex_cursor.selectionStart()).blockNumber()
+
+        hex_ending_position_in_block = hex_cursor.selectionEnd() - self.hex_panel.document().findBlock(
+            hex_cursor.selectionEnd()).position()
+        hex_ending_block = self.hex_panel.document().findBlock(
+            hex_cursor.selectionEnd()).blockNumber()
+
+        text_starting_block_pos = self.text_panel.document(
+        ).findBlockByNumber(hex_starting_block).position()
+        text_cursor.setPosition(
+            text_starting_block_pos + math.floor(hex_starting_position_in_block/3))
+
+        text_ending_block_pos = self.text_panel.document(
+        ).findBlockByNumber(hex_ending_block).position()
+        text_cursor.setPosition(text_ending_block_pos + math.ceil(hex_ending_position_in_block/3),
+                                QtGui.QTextCursor.KeepAnchor)
+
+        self.text_panel.setTextCursor(text_cursor)
+
+        self.text_panel.blockSignals(old_state)
 
     def text_selection_changed(self):
         """Match selection from text panel to hex panel"""
