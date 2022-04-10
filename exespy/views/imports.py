@@ -37,5 +37,7 @@ class ImportsView(QtWidgets.QScrollArea):
                         hex(import_func.address)
                     ))
 
+        # TODO: Add support for delay imports DIRECTORY_ENTRY_DELAY_IMPORT
+
         self.imports_group.view.setModel(table.TableModel(
             imports_list, headers=["Name", "Library", "Address"]))

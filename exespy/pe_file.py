@@ -1,8 +1,18 @@
+from dataclasses import dataclass
 import os
 
 import pefile
 import lief
 
+@dataclass
+class Resource:
+    rtype: str
+    id: str
+    lang: str
+    sublang: str
+    size: int
+    offset: int
+    data: bytes
 
 class PEFile:
     """Base class for representing a PE file"""
@@ -19,6 +29,8 @@ class PEFile:
         self.lief_obj = lief.parse(path)
         # TODO: this is a very slow operation, any way to speed up checksum generation?
         self.calculated_checksum = self.pe.generate_checksum()
+
+        self.resources = self.get_resources()
 
     def type(self) -> str:
         """Return the type of the PE file (PE/DLL/etc)"""
@@ -124,6 +136,53 @@ class PEFile:
     def section_characteristics_str(self, section_num) -> str:
         """Convert the section characteristics to a readable string"""
         return ", ".join([c.replace("IMAGE_SCN_", "") for c in self.section_characteristics(section_num)])
+
+    def get_resources(self) -> "list[Resource]":
+        """Return a list of resources for the PE file"""
+        resources: "list[Resource]" = []
+
+        # Parse PE resources
+        if hasattr(self.pe, "DIRECTORY_ENTRY_RESOURCE"):
+            for type_item in self.pe.DIRECTORY_ENTRY_RESOURCE.entries:
+                if type_item.name is not None:
+                    resource_type = str(type_item.name)
+                else:
+                    resource_type = pefile.RESOURCE_TYPE[type_item.id]
+
+                if hasattr(type_item, "directory") and hasattr(
+                    type_item.directory, "entries"
+                ):
+                    for id_item in type_item.directory.entries:
+                        if id_item.name is not None:
+                            resource_id = str(id_item.name)
+                        else:
+                            resource_id = id_item.id
+
+                        if hasattr(id_item, "directory") and hasattr(
+                            id_item.directory, "entries"
+                        ):
+                            for language_item in id_item.directory.entries:
+                                lang = pefile.LANG[language_item.data.lang]
+                                sublang = pefile.get_sublang_name_for_lang(
+                                    language_item.data.lang, language_item.data.sublang
+                                )
+
+                                resource_obj = Resource(
+                                    resource_type,
+                                    resource_id,
+                                    lang,
+                                    sublang,
+                                    language_item.data.struct.Size,
+                                    language_item.data.struct.OffsetToData,
+                                    bytes(self.pe.get_data(
+                                        language_item.data.struct.OffsetToData,
+                                        language_item.data.struct.Size,
+                                    )),
+                                )
+
+                                resources.append(resource_obj)
+
+        return resources
 
     # TODO: this is slow, maybe do in another thread?
     def strings(self, min_length=10) -> "list[str]":
