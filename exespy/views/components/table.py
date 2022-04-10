@@ -5,11 +5,20 @@ import PySide6.QtWidgets as QtWidgets
 class TableGroup(QtWidgets.QGroupBox):
     """QGroupBox with a Table inside"""
 
-    def __init__(self, title, *args, fit_columns=False, headers=None, fit_to_contents=True, **kwargs):
+    def __init__(
+        self,
+        title,
+        *args,
+        fit_columns=False,
+        headers=None,
+        fit_to_contents=True,
+        **kwargs
+    ):
         super().__init__(title, *args, **kwargs)
 
-        self.view = TableView(fit_columns=fit_columns,
-                              headers=headers, fit_to_contents=fit_to_contents)
+        self.view = TableView(
+            fit_columns=fit_columns, headers=headers, fit_to_contents=fit_to_contents
+        )
 
         self.setLayout(QtWidgets.QFormLayout())
         self.layout().setContentsMargins(0, 0, 0, 0)
@@ -65,7 +74,15 @@ class TableModel(QtCore.QAbstractTableModel):
 class TableView(QtWidgets.QTableView):
     """Custom QTableView for displaying a table"""
 
-    def __init__(self, *args, fit_columns=False, headers=None, fit_to_contents=True, first_column_scale=3, ** kwargs) -> None:
+    def __init__(
+        self,
+        *args,
+        fit_columns=False,
+        headers=None,
+        fit_to_contents=True,
+        first_column_scale=3,
+        **kwargs
+    ) -> None:
         super().__init__(*args, **kwargs)
 
         self.headers = headers
@@ -82,7 +99,8 @@ class TableView(QtWidgets.QTableView):
         self.verticalHeader().hide()
 
         self.setSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum)
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+        )
         self.setFrameStyle(QtWidgets.QFrame.NoFrame)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
@@ -95,7 +113,8 @@ class TableView(QtWidgets.QTableView):
         if self.fit_columns:
             for col in range(self.horizontalHeader().count()):
                 self.horizontalHeader().setSectionResizeMode(
-                    col, QtWidgets.QHeaderView.ResizeToContents)
+                    col, QtWidgets.QHeaderView.ResizeToContents
+                )
         else:
             self.setColumnWidth(0, self.width() / self.first_column_scale)
 

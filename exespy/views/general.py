@@ -56,7 +56,8 @@ class GeneralView(QtWidgets.QScrollArea):
             pixmap = QtGui.QPixmap()
             pixmap.loadFromData(icon_bytes)
             pixmap = pixmap.scaled(
-                48, 48, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation)
+                48, 48, QtCore.Qt.KeepAspectRatio, QtCore.Qt.SmoothTransformation
+            )
             self.icon.setPixmap(pixmap)
         except icoextract.IconExtractorError:
             pass
@@ -65,22 +66,36 @@ class GeneralView(QtWidgets.QScrollArea):
         c_time = helpers.format_time(pe_obj.stat.st_ctime)
         m_time = helpers.format_time(pe_obj.stat.st_mtime)
         a_time = helpers.format_time(pe_obj.stat.st_atime)
-        self.file_group.view.setModel(table.TableModel([
-            ("Path", pe_obj.path),
-            ("Created", c_time),
-            ("Modified", m_time),
-            ("Accessed", a_time)
-        ]))
+        self.file_group.view.setModel(
+            table.TableModel(
+                [
+                    ("Path", pe_obj.path),
+                    ("Created", c_time),
+                    ("Modified", m_time),
+                    ("Accessed", a_time),
+                ]
+            )
+        )
 
         # Image Information
-        self.image_group.view.setModel(table.TableModel([
-            ("Size", f"{humanize.naturalsize(pe_obj.stat.st_size, binary=True)} ({humanize.intcomma(pe_obj.stat.st_size)} bytes)"),
-            ("Timestamp", helpers.format_time(pe_obj.pe.FILE_HEADER.TimeDateStamp)),
-            ("Type", pe_obj.type()),
-            ("Architecture", pe_obj.architecture()),
-            ("Subsystem", pe_obj.subsystem()),
-            ("Image Base", hex(pe_obj.pe.OPTIONAL_HEADER.ImageBase)),
-            ("Entrypoint", hex(pe_obj.pe.OPTIONAL_HEADER.AddressOfEntryPoint)),
-            ("Signature", pe_obj.verify_signature()),
-            ("Checksum", pe_obj.verify_checksum())
-        ]))
+        self.image_group.view.setModel(
+            table.TableModel(
+                [
+                    (
+                        "Size",
+                        f"{humanize.naturalsize(pe_obj.stat.st_size, binary=True)} ({humanize.intcomma(pe_obj.stat.st_size)} bytes)",
+                    ),
+                    (
+                        "Timestamp",
+                        helpers.format_time(pe_obj.pe.FILE_HEADER.TimeDateStamp),
+                    ),
+                    ("Type", pe_obj.type()),
+                    ("Architecture", pe_obj.architecture()),
+                    ("Subsystem", pe_obj.subsystem()),
+                    ("Image Base", hex(pe_obj.pe.OPTIONAL_HEADER.ImageBase)),
+                    ("Entrypoint", hex(pe_obj.pe.OPTIONAL_HEADER.AddressOfEntryPoint)),
+                    ("Signature", pe_obj.verify_signature()),
+                    ("Checksum", pe_obj.verify_checksum()),
+                ]
+            )
+        )

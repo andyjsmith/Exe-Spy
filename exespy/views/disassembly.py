@@ -24,12 +24,14 @@ class DisassemblyView(QtWidgets.QWidget):
         self.controls_widget.setLayout(QtWidgets.QHBoxLayout())
         self.controls_widget.layout().setContentsMargins(0, 0, 0, 0)
         self.controls_widget.setSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Maximum)
+            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Maximum
+        )
 
         self.entrypoint_btn = QtWidgets.QPushButton("Go to Entrypoint")
         self.entrypoint_btn.clicked.connect(self.handle_entrypoint_btn_clicked)
         self.entrypoint_btn.setSizePolicy(
-            QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum)
+            QtWidgets.QSizePolicy.Maximum, QtWidgets.QSizePolicy.Maximum
+        )
         self.controls_widget.layout().addWidget(self.entrypoint_btn)
         self.controls_widget.layout().addStretch()
 
@@ -45,9 +47,11 @@ class DisassemblyView(QtWidgets.QWidget):
 
         self.formatter_syntax_box = QtWidgets.QComboBox()
         self.formatter_syntax_box.addItems(
-            ["Intel", "GNU Assembler (AT&T)", "masm", "nasm"])
+            ["Intel", "GNU Assembler (AT&T)", "masm", "nasm"]
+        )
         self.formatter_syntax_box.currentTextChanged.connect(
-            self.handle_formatter_changed)
+            self.handle_formatter_changed
+        )
         self.controls_widget.layout().addWidget(self.formatter_syntax_box)
 
         self.layout().addWidget(self.controls_widget)
@@ -73,12 +77,22 @@ class DisassemblyView(QtWidgets.QWidget):
         else:
             syntax = iced_x86.FormatterSyntax.INTEL
 
-        self.assembly, self.addresses = self.get_disassembly(pe_obj.pe.get_memory_mapped_image(
-        ), image_base=pe_obj.pe.OPTIONAL_HEADER.ImageBase, is_64bit=pe_obj.is_64bit(), syntax=syntax)
+        self.assembly, self.addresses = self.get_disassembly(
+            pe_obj.pe.get_memory_mapped_image(),
+            image_base=pe_obj.pe.OPTIONAL_HEADER.ImageBase,
+            is_64bit=pe_obj.is_64bit(),
+            syntax=syntax,
+        )
 
         self.text_edit.setPlainText("\n".join(self.assembly))
 
-    def get_disassembly(self, code: bytes, image_base=0, is_64bit=False, syntax=iced_x86.FormatterSyntax.GAS) -> "tuple[list[str], list[int]]":
+    def get_disassembly(
+        self,
+        code: bytes,
+        image_base=0,
+        is_64bit=False,
+        syntax=iced_x86.FormatterSyntax.GAS,
+    ) -> "tuple[list[str], list[int]]":
         """
         Get the disassembly of the given x86 code.
         :param code: The code to disassemble.
@@ -98,17 +112,14 @@ class DisassemblyView(QtWidgets.QWidget):
             disasm = formatter.format(instr)
 
             start_index = instr.ip
-            bytes_str = code[start_index:start_index +
-                             instr.len].hex().upper()
+            bytes_str = code[start_index : start_index + instr.len].hex().upper()
 
             if is_64bit:
-                assembly.append(
-                    f"{instr.ip+image_base:016X} {bytes_str:20} {disasm}")
+                assembly.append(f"{instr.ip+image_base:016X} {bytes_str:20} {disasm}")
             else:
-                assembly.append(
-                    f"{instr.ip+image_base:08X} {bytes_str:20} {disasm}")
+                assembly.append(f"{instr.ip+image_base:08X} {bytes_str:20} {disasm}")
 
-            addresses.append(instr.ip+image_base)
+            addresses.append(instr.ip + image_base)
 
         return assembly, addresses
 
@@ -135,7 +146,7 @@ class DisassemblyView(QtWidgets.QWidget):
             helpers.show_message_box(
                 "The address you entered was invalid.",
                 alert_type=helpers.MessageBoxTypes.CRITICAL,
-                title="Invalid Address"
+                title="Invalid Address",
             )
             return
 
@@ -164,8 +175,7 @@ class DisassemblyView(QtWidgets.QWidget):
                 closest_line = i
 
             # Calculate distance with image base
-            distance_base = abs(
-                address - (target_address + self.pe_obj.image_base()))
+            distance_base = abs(address - (target_address + self.pe_obj.image_base()))
             if distance_base <= closest_distance_base:
                 closest_distance_base = distance_base
                 closest_line_base = i
@@ -178,8 +188,9 @@ class DisassemblyView(QtWidgets.QWidget):
 
         # Scroll to and highlight the line
         cursor = self.text_edit.textCursor()
-        cursor.setPosition(self.text_edit.document(
-        ).findBlockByLineNumber(entrypoint_line).position())
+        cursor.setPosition(
+            self.text_edit.document().findBlockByLineNumber(entrypoint_line).position()
+        )
         cursor.select(QtGui.QTextCursor.LineUnderCursor)
         self.text_edit.setTextCursor(cursor)
         self.text_edit.setFocus()

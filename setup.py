@@ -11,12 +11,7 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/andyjsmith/ExeSpy",
-    keywords=[
-        "pe",
-        "forensics",
-        "windows forensics",
-        "forensics tools"
-    ],
+    keywords=["pe", "forensics", "windows forensics", "forensics tools"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
@@ -27,19 +22,13 @@ setup(
         "Environment :: Win32 (MS Windows)",
         "Environment :: X11 Applications",
         "Environment :: X11 Applications :: Qt",
-        "Environment :: MacOS X"
+        "Environment :: MacOS X",
     ],
     packages=find_packages(),
     python_requires=">=3.6",
-    install_requires=[
-        "PySide6",
-        "pefile",
-        "lief",
-        "humanize",
-        "icoextract"
-    ],
+    install_requires=["PySide6", "pefile", "lief", "humanize", "icoextract"],
     entry_points={
         "console_scripts": ["exespy=exespy.exespy:main"],
     },
-    include_package_data=True
+    include_package_data=True,
 )

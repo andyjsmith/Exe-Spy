@@ -16,7 +16,8 @@ class ImportsView(QtWidgets.QScrollArea):
 
         # Imports
         self.imports_group = table.TableGroup(
-            "Imports", fit_columns=True, headers=["Name", "Library", "Address"])
+            "Imports", fit_columns=True, headers=["Name", "Library", "Address"]
+        )
         self.scroll_area.layout().addWidget(self.imports_group)
 
     def load(self, pe_obj: pe_file.PEFile):
@@ -27,17 +28,20 @@ class ImportsView(QtWidgets.QScrollArea):
             for import_obj in pe_obj.pe.DIRECTORY_ENTRY_IMPORT:
                 for import_func in import_obj.imports:
                     if import_func.name:
-                        name = import_func.name.decode("utf-8").strip('\x00')
+                        name = import_func.name.decode("utf-8").strip("\x00")
                     else:
                         name = f"[Ordinal {import_func.ordinal}]"
 
-                    imports_list.append((
-                        name,
-                        import_obj.dll.decode("utf-8").strip('\x00'),
-                        hex(import_func.address)
-                    ))
+                    imports_list.append(
+                        (
+                            name,
+                            import_obj.dll.decode("utf-8").strip("\x00"),
+                            hex(import_func.address),
+                        )
+                    )
 
         # TODO: Add support for delay imports DIRECTORY_ENTRY_DELAY_IMPORT
 
-        self.imports_group.view.setModel(table.TableModel(
-            imports_list, headers=["Name", "Library", "Address"]))
+        self.imports_group.view.setModel(
+            table.TableModel(imports_list, headers=["Name", "Library", "Address"])
+        )

@@ -2,8 +2,7 @@ import pefile
 from iced_x86 import *
 
 pe = pefile.PE("C:\\Users\\Andy\\Downloads\\notepad.exe")
-EXAMPLE_CODE = pe.get_memory_mapped_image(
-    ImageBase=pe.OPTIONAL_HEADER.ImageBase)
+EXAMPLE_CODE = pe.get_memory_mapped_image(ImageBase=pe.OPTIONAL_HEADER.ImageBase)
 EXAMPLE_CODE_BITNESS = 64
 
 # Create the decoder and initialize RIP
@@ -31,8 +30,8 @@ with open("disasm.txt", "w") as f:
         #   operands_str = formatter.format_all_operands(instr)
 
         start_index = instr.ip
-        bytes_str = EXAMPLE_CODE[start_index:start_index +
-                                 instr.len].hex().upper()
+        bytes_str = EXAMPLE_CODE[start_index : start_index + instr.len].hex().upper()
         # Eg. "00007FFAC46ACDB2 488DAC2400FFFFFF     lea       rbp,[rsp-100h]"
         f.write(
-            f"{instr.ip+pe.OPTIONAL_HEADER.ImageBase:016X} {bytes_str:20} {disasm}\n")
+            f"{instr.ip+pe.OPTIONAL_HEADER.ImageBase:016X} {bytes_str:20} {disasm}\n"
+        )

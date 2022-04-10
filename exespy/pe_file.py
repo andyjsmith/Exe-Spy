@@ -4,6 +4,7 @@ import os
 import pefile
 import lief
 
+
 @dataclass
 class Resource:
     rtype: str
@@ -13,6 +14,7 @@ class Resource:
     size: int
     offset: int
     data: bytes
+
 
 class PEFile:
     """Base class for representing a PE file"""
@@ -45,7 +47,9 @@ class PEFile:
 
     def architecture(self) -> str:
         """Return the architecture of the PE file"""
-        return pefile.MACHINE_TYPE[self.pe.FILE_HEADER.Machine].replace("IMAGE_FILE_MACHINE_", "")
+        return pefile.MACHINE_TYPE[self.pe.FILE_HEADER.Machine].replace(
+            "IMAGE_FILE_MACHINE_", ""
+        )
 
     def is_x86(self) -> bool:
         """Return whether the PE file uses the x86 instruction set"""
@@ -61,7 +65,9 @@ class PEFile:
 
     def subsystem(self) -> str:
         """Return the subsystem of the PE file"""
-        return pefile.SUBSYSTEM_TYPE[self.pe.OPTIONAL_HEADER.Subsystem].replace("IMAGE_SUBSYSTEM_", "")
+        return pefile.SUBSYSTEM_TYPE[self.pe.OPTIONAL_HEADER.Subsystem].replace(
+            "IMAGE_SUBSYSTEM_", ""
+        )
 
     def entrypoint(self) -> int:
         """Return the entrypoint of the PE file"""
@@ -115,14 +121,19 @@ class PEFile:
 
     def dll_characteristics_str(self) -> str:
         """Convert the DLL characteristics to a readable string"""
-        return ", ".join([c.replace("IMAGE_DLLCHARACTERISTICS_", "").replace("IMAGE_LIBRARY_", "") for c in self.dll_characteristics()])
+        return ", ".join(
+            [
+                c.replace("IMAGE_DLLCHARACTERISTICS_", "").replace("IMAGE_LIBRARY_", "")
+                for c in self.dll_characteristics()
+            ]
+        )
 
     def pe_format(self) -> str:
         """Return the PE format of the PE file (PE32 or PE32+)"""
         if self.pe.OPTIONAL_HEADER.Magic == pefile.OPTIONAL_HEADER_MAGIC_PE:
-            return("PE32")
+            return "PE32"
         elif self.pe.OPTIONAL_HEADER.Magic == pefile.OPTIONAL_HEADER_MAGIC_PE_PLUS:
-            return("PE32+")
+            return "PE32+"
         return "unknown"
 
     def section_characteristics(self, section_num) -> "list[str]":
@@ -135,7 +146,12 @@ class PEFile:
 
     def section_characteristics_str(self, section_num) -> str:
         """Convert the section characteristics to a readable string"""
-        return ", ".join([c.replace("IMAGE_SCN_", "") for c in self.section_characteristics(section_num)])
+        return ", ".join(
+            [
+                c.replace("IMAGE_SCN_", "")
+                for c in self.section_characteristics(section_num)
+            ]
+        )
 
     def get_resources(self) -> "list[Resource]":
         """Return a list of resources for the PE file"""
@@ -174,10 +190,12 @@ class PEFile:
                                     sublang,
                                     language_item.data.struct.Size,
                                     language_item.data.struct.OffsetToData,
-                                    bytes(self.pe.get_data(
-                                        language_item.data.struct.OffsetToData,
-                                        language_item.data.struct.Size,
-                                    )),
+                                    bytes(
+                                        self.pe.get_data(
+                                            language_item.data.struct.OffsetToData,
+                                            language_item.data.struct.Size,
+                                        )
+                                    ),
                                 )
 
                                 resources.append(resource_obj)
@@ -197,13 +215,18 @@ class PEFile:
                     current_string += byte
                 else:
                     if len(current_string) >= min_length:
-                        strings.append((current_string.decode(
-                            "ascii"), f.tell() - len(current_string) - 1))
+                        strings.append(
+                            (
+                                current_string.decode("ascii"),
+                                f.tell() - len(current_string) - 1,
+                            )
+                        )
                     current_string = b""
                 byte = f.read(1)
 
             if len(current_string) >= min_length:
-                strings.append((current_string.decode("ascii"),
-                                f.tell() - len(current_string)))
+                strings.append(
+                    (current_string.decode("ascii"), f.tell() - len(current_string))
+                )
 
         return strings

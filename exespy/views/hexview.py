@@ -9,7 +9,6 @@ from .components import textedit
 
 
 class HexView(QtWidgets.QWidget):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -26,8 +25,7 @@ class HexView(QtWidgets.QWidget):
         address_label.setFont(self.address_panel.font())
         self.layout().addWidget(address_label, 0, 0, 1, 1)
 
-        hex_label = QtWidgets.QLabel(
-            "00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F")
+        hex_label = QtWidgets.QLabel("00 01 02 03 04 05 06 07 08 09 0A 0B 0C 0D 0E 0F")
         hex_label.setFont(self.hex_panel.font())
         hex_label.setAlignment(QtCore.Qt.AlignCenter)
         self.layout().addWidget(hex_label, 0, 1, 1, 1)
@@ -42,38 +40,55 @@ class HexView(QtWidgets.QWidget):
         # Cross-connect all the valueChanged signals to the setValue slots so
         # that the panels scroll together
         self.address_panel.verticalScrollBar().valueChanged.connect(
-            self.hex_panel.verticalScrollBar().setValue)
+            self.hex_panel.verticalScrollBar().setValue
+        )
         self.address_panel.verticalScrollBar().valueChanged.connect(
-            self.text_panel.verticalScrollBar().setValue)
+            self.text_panel.verticalScrollBar().setValue
+        )
         self.hex_panel.verticalScrollBar().valueChanged.connect(
-            self.address_panel.verticalScrollBar().setValue)
+            self.address_panel.verticalScrollBar().setValue
+        )
         self.hex_panel.verticalScrollBar().valueChanged.connect(
-            self.text_panel.verticalScrollBar().setValue)
+            self.text_panel.verticalScrollBar().setValue
+        )
         self.text_panel.verticalScrollBar().valueChanged.connect(
-            self.address_panel.verticalScrollBar().setValue)
+            self.address_panel.verticalScrollBar().setValue
+        )
         self.text_panel.verticalScrollBar().valueChanged.connect(
-            self.hex_panel.verticalScrollBar().setValue)
+            self.hex_panel.verticalScrollBar().setValue
+        )
 
         # Hide the address and hex panel scrollbars, only show the text panel
-        self.address_panel.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
-        self.hex_panel.setVerticalScrollBarPolicy(
-            QtCore.Qt.ScrollBarAlwaysOff)
+        self.address_panel.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.hex_panel.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
 
         # Set the size of the panels to the smallest possible
         self.address_panel.setSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding
+        )
         self.hex_panel.setSizePolicy(
-            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
+            QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding
+        )
         self.text_panel.setSizePolicy(
-            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+            QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding
+        )
 
         # Make the panels inactive highlight color match the active color
         palette_match_active_highlight = self.hex_panel.palette()
-        palette_match_active_highlight.setColor(QtGui.QPalette.Inactive, QtGui.QPalette.Highlight, palette_match_active_highlight.color(
-            QtGui.QPalette.Active, QtGui.QPalette.Highlight))
-        palette_match_active_highlight.setColor(QtGui.QPalette.Inactive, QtGui.QPalette.HighlightedText, palette_match_active_highlight.color(
-            QtGui.QPalette.Active, QtGui.QPalette.HighlightedText))
+        palette_match_active_highlight.setColor(
+            QtGui.QPalette.Inactive,
+            QtGui.QPalette.Highlight,
+            palette_match_active_highlight.color(
+                QtGui.QPalette.Active, QtGui.QPalette.Highlight
+            ),
+        )
+        palette_match_active_highlight.setColor(
+            QtGui.QPalette.Inactive,
+            QtGui.QPalette.HighlightedText,
+            palette_match_active_highlight.color(
+                QtGui.QPalette.Active, QtGui.QPalette.HighlightedText
+            ),
+        )
         self.hex_panel.setPalette(palette_match_active_highlight)
         self.text_panel.setPalette(palette_match_active_highlight)
 
@@ -97,7 +112,8 @@ class HexView(QtWidgets.QWidget):
             data = f.read(BYTES_PER_LINE)
             while data:
                 address_values.append(
-                    "{0:0{1}X}".format(f.tell()-BYTES_PER_LINE, NUM_ADDRESS_CHARS))
+                    "{0:0{1}X}".format(f.tell() - BYTES_PER_LINE, NUM_ADDRESS_CHARS)
+                )
                 hex_values.append(" ".join(["{:02x}".format(x) for x in data]))
                 text_values.append(self.bytes_to_str(data))
 
@@ -153,12 +169,12 @@ class HexView(QtWidgets.QWidget):
         try:
             if text[start] == " ":
                 start += 1
-            elif text[start+1] == " ":
+            elif text[start + 1] == " ":
                 start -= 1
             # Adjust the selection end
-            if text[end-1] == " ":
+            if text[end - 1] == " ":
                 end -= 1
-            elif end == 1 or text[end-2] == " ":
+            elif end == 1 or text[end - 2] == " ":
                 end += 1
         except IndexError:
             # Ignore any IndexErrors from selecting at the start/end
@@ -186,25 +202,40 @@ class HexView(QtWidgets.QWidget):
         text_cursor = self.text_panel.textCursor()
 
         # Calculate corresponding positions using blocks
-        hex_starting_position_in_block = hex_cursor.selectionStart() - self.hex_panel.document().findBlock(
-            hex_cursor.selectionStart()).position()
-        hex_starting_block = self.hex_panel.document().findBlock(
-            hex_cursor.selectionStart()).blockNumber()
+        hex_starting_position_in_block = (
+            hex_cursor.selectionStart()
+            - self.hex_panel.document()
+            .findBlock(hex_cursor.selectionStart())
+            .position()
+        )
+        hex_starting_block = (
+            self.hex_panel.document()
+            .findBlock(hex_cursor.selectionStart())
+            .blockNumber()
+        )
 
-        hex_ending_position_in_block = hex_cursor.selectionEnd() - self.hex_panel.document().findBlock(
-            hex_cursor.selectionEnd()).position()
-        hex_ending_block = self.hex_panel.document().findBlock(
-            hex_cursor.selectionEnd()).blockNumber()
+        hex_ending_position_in_block = (
+            hex_cursor.selectionEnd()
+            - self.hex_panel.document().findBlock(hex_cursor.selectionEnd()).position()
+        )
+        hex_ending_block = (
+            self.hex_panel.document().findBlock(hex_cursor.selectionEnd()).blockNumber()
+        )
 
-        text_starting_block_pos = self.text_panel.document(
-        ).findBlockByNumber(hex_starting_block).position()
+        text_starting_block_pos = (
+            self.text_panel.document().findBlockByNumber(hex_starting_block).position()
+        )
         text_cursor.setPosition(
-            text_starting_block_pos + math.floor(hex_starting_position_in_block/3))
+            text_starting_block_pos + math.floor(hex_starting_position_in_block / 3)
+        )
 
-        text_ending_block_pos = self.text_panel.document(
-        ).findBlockByNumber(hex_ending_block).position()
-        text_cursor.setPosition(text_ending_block_pos + math.ceil(hex_ending_position_in_block/3),
-                                QtGui.QTextCursor.KeepAnchor)
+        text_ending_block_pos = (
+            self.text_panel.document().findBlockByNumber(hex_ending_block).position()
+        )
+        text_cursor.setPosition(
+            text_ending_block_pos + math.ceil(hex_ending_position_in_block / 3),
+            QtGui.QTextCursor.KeepAnchor,
+        )
 
         self.text_panel.setTextCursor(text_cursor)
 
@@ -218,25 +249,44 @@ class HexView(QtWidgets.QWidget):
         text_cursor = self.text_panel.textCursor()
 
         # Calculate corresponding positions using blocks
-        text_starting_position_in_block = text_cursor.selectionStart() - self.text_panel.document().findBlock(
-            text_cursor.selectionStart()).position()
-        text_starting_block = self.text_panel.document().findBlock(
-            text_cursor.selectionStart()).blockNumber()
+        text_starting_position_in_block = (
+            text_cursor.selectionStart()
+            - self.text_panel.document()
+            .findBlock(text_cursor.selectionStart())
+            .position()
+        )
+        text_starting_block = (
+            self.text_panel.document()
+            .findBlock(text_cursor.selectionStart())
+            .blockNumber()
+        )
 
-        text_ending_position_in_block = text_cursor.selectionEnd() - self.text_panel.document().findBlock(
-            text_cursor.selectionEnd()).position()
-        text_ending_block = self.text_panel.document().findBlock(
-            text_cursor.selectionEnd()).blockNumber()
+        text_ending_position_in_block = (
+            text_cursor.selectionEnd()
+            - self.text_panel.document()
+            .findBlock(text_cursor.selectionEnd())
+            .position()
+        )
+        text_ending_block = (
+            self.text_panel.document()
+            .findBlock(text_cursor.selectionEnd())
+            .blockNumber()
+        )
 
-        hex_starting_block_pos = self.hex_panel.document(
-        ).findBlockByNumber(text_starting_block).position()
+        hex_starting_block_pos = (
+            self.hex_panel.document().findBlockByNumber(text_starting_block).position()
+        )
         hex_cursor.setPosition(
-            hex_starting_block_pos + 3*text_starting_position_in_block)
+            hex_starting_block_pos + 3 * text_starting_position_in_block
+        )
 
-        hex_ending_block_pos = self.hex_panel.document(
-        ).findBlockByNumber(text_ending_block).position()
-        hex_cursor.setPosition(hex_ending_block_pos + 3*text_ending_position_in_block - 1,
-                               QtGui.QTextCursor.KeepAnchor)
+        hex_ending_block_pos = (
+            self.hex_panel.document().findBlockByNumber(text_ending_block).position()
+        )
+        hex_cursor.setPosition(
+            hex_ending_block_pos + 3 * text_ending_position_in_block - 1,
+            QtGui.QTextCursor.KeepAnchor,
+        )
 
         self.hex_panel.setTextCursor(hex_cursor)
 

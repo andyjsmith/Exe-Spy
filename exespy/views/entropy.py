@@ -62,7 +62,7 @@ class EntropyView(QtWidgets.QWidget):
 
         figure = Figure()
         plt.imshow(items, cmap="hot", interpolation="nearest")
-        plt.show()
+        # plt.show()
         canvas = FigureCanvasQTAgg(figure)
         canvas.axes = figure.add_subplot()
         canvas.axes.set_title("Entropy")
@@ -81,11 +81,7 @@ class EntropyView(QtWidgets.QWidget):
         Calculate entropy for a given iterable.
         https://stackoverflow.com/questions/15450192/fastest-way-to-compute-entropy-in-python/37890790#37890790
         """
-        base = {
-            "shannon": 2.,
-            "natural": math.exp(1),
-            "hartley": 10.
-        }
+        base = {"shannon": 2.0, "natural": math.exp(1), "hartley": 10.0}
 
         if len(data) <= 1:
             return 0
@@ -99,7 +95,7 @@ class EntropyView(QtWidgets.QWidget):
 
         probs = [float(c) / len(data) for c in counts.values()]
         for p in probs:
-            if p > 0.:
+            if p > 0.0:
                 ent -= p * math.log(p, base[unit])
 
         return ent

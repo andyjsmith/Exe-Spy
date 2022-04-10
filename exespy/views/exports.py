@@ -16,7 +16,8 @@ class ExportsView(QtWidgets.QScrollArea):
 
         # Exports
         self.exports_group = table.TableGroup(
-            "Exports", fit_columns=True, headers=["Name", "Ordinal", "Address"])
+            "Exports", fit_columns=True, headers=["Name", "Ordinal", "Address"]
+        )
         self.scroll_area.layout().addWidget(self.exports_group)
 
     def load(self, pe_obj: pe_file.PEFile):
@@ -26,15 +27,12 @@ class ExportsView(QtWidgets.QScrollArea):
         if hasattr(pe_obj.pe, "DIRECTORY_ENTRY_EXPORT"):
             for symbol in pe_obj.pe.DIRECTORY_ENTRY_EXPORT.symbols:
                 if symbol.name:
-                    name = symbol.name.decode("utf-8").strip('\x00')
+                    name = symbol.name.decode("utf-8").strip("\x00")
                 else:
                     name = f"[Ordinal {symbol.ordinal}]"
 
-                exports_list.append((
-                    name,
-                    symbol.ordinal,
-                    hex(symbol.address)
-                ))
+                exports_list.append((name, symbol.ordinal, hex(symbol.address)))
 
-        self.exports_group.view.setModel(table.TableModel(
-            exports_list, headers=["Name", "Ordinal", "Address"]))
+        self.exports_group.view.setModel(
+            table.TableModel(exports_list, headers=["Name", "Ordinal", "Address"])
+        )

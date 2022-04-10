@@ -15,8 +15,7 @@ class LicenseDialog(QtWidgets.QDialog):
 
         text = QtWidgets.QPlainTextEdit()
         text.setReadOnly(True)
-        text_file = QtCore.QFile(
-            helpers.resource_path("third_party_licenses.txt"))
+        text_file = QtCore.QFile(helpers.resource_path("third_party_licenses.txt"))
         if not text_file.open(QtCore.QIODevice.ReadOnly):
             print(text_file.errorString())
 

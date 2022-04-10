@@ -5,12 +5,27 @@ import PySide6.QtWidgets as QtWidgets
 import PySide6.QtGui as QtGui
 
 from . import pe_file
-from .views import view
-from .views import general, headers, strings, hashes, sections, libraries, imports, exports, resources, hexview, virustotal, disassembly, entropy
+from .views import (
+    view,
+    general,
+    headers,
+    strings,
+    hashes,
+    sections,
+    libraries,
+    imports,
+    exports,
+    resources,
+    hexview,
+    virustotal,
+    disassembly,
+    entropy,
+)
 
 
 class TabBar(QtWidgets.QTabBar):
     """Custom tab bar for horizontal text in a west/east tab position"""
+
     # https://stackoverflow.com/questions/51230544/pyqt5-how-to-set-tabwidget-west-but-keep-the-text-horizontal
 
     def tabSizeHint(self, index):
@@ -71,16 +86,18 @@ class TabView(QtWidgets.QTabWidget):
 
         self.tabs[Tabs.GENERAL] = general.GeneralView()
         self.addTab(self.tabs[Tabs.GENERAL], "General")
-        self.tabBar().setTabTextColor(self.indexOf(
-            self.tabs[Tabs.GENERAL]), QtGui.QColor(255, 0, 0))
+        self.tabBar().setTabTextColor(
+            self.indexOf(self.tabs[Tabs.GENERAL]), QtGui.QColor(255, 0, 0)
+        )
 
         self.tabs[Tabs.HEADERS] = headers.HeadersView()
         self.addTab(self.tabs[Tabs.HEADERS], "Headers")
 
         self.tabs[Tabs.SECTIONS] = sections.SectionsView()
         self.addTab(self.tabs[Tabs.SECTIONS], "Sections")
-        self.tabBar().setTabTextColor(self.indexOf(
-            self.tabs[Tabs.SECTIONS]), QtGui.QColor(150, 150, 150))
+        self.tabBar().setTabTextColor(
+            self.indexOf(self.tabs[Tabs.SECTIONS]), QtGui.QColor(150, 150, 150)
+        )
         # self.tabBar().setTabEnabled(self.indexOf(
         #     self.tabs[Tabs.SECTIONS]), False)
 

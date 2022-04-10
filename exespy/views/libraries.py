@@ -16,17 +16,21 @@ class LibrariesView(QtWidgets.QScrollArea):
 
         # Libraries
         self.libraries_group = table.TableGroup(
-            "Libraries", fit_columns=True, headers=["Name", "Imports"])
+            "Libraries", fit_columns=True, headers=["Name", "Imports"]
+        )
         self.scroll_area.layout().addWidget(self.libraries_group)
 
     def load(self, pe_obj: pe_file.PEFile):
         # Libraries
         libraries_list = []
         for import_obj in pe_obj.pe.DIRECTORY_ENTRY_IMPORT:
-            libraries_list.append((
-                import_obj.dll.decode("utf-8").strip('\x00'),
-                len(import_obj.imports),
-            ))
+            libraries_list.append(
+                (
+                    import_obj.dll.decode("utf-8").strip("\x00"),
+                    len(import_obj.imports),
+                )
+            )
 
-        self.libraries_group.view.setModel(table.TableModel(
-            libraries_list, headers=["Name", "Imports"]))
+        self.libraries_group.view.setModel(
+            table.TableModel(libraries_list, headers=["Name", "Imports"])
+        )

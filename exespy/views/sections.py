@@ -16,7 +16,17 @@ class SectionsView(QtWidgets.QScrollArea):
 
         # Sections
         self.sections_group = table.TableGroup(
-            "Sections", fit_columns=True, headers=["Name", "VirtualSize", "VirtualAddress", "SizeOfRawData", "PointerToRawData", "Characteristics"])
+            "Sections",
+            fit_columns=True,
+            headers=[
+                "Name",
+                "VirtualSize",
+                "VirtualAddress",
+                "SizeOfRawData",
+                "PointerToRawData",
+                "Characteristics",
+            ],
+        )
         self.scroll_area.layout().addWidget(self.sections_group)
 
     def load(self, pe_obj: pe_file.PEFile):
@@ -24,14 +34,27 @@ class SectionsView(QtWidgets.QScrollArea):
         # Sections
         sections_list = []
         for i, section in enumerate(pe_obj.pe.sections):
-            sections_list.append((
-                section.Name.decode("utf-8").strip('\x00'),
-                section.Misc_VirtualSize,
-                hex(section.VirtualAddress),
-                section.SizeOfRawData,
-                hex(section.PointerToRawData),
-                f"{hex(section.Characteristics)} ({pe_obj.section_characteristics_str(i)})",
-            ))
+            sections_list.append(
+                (
+                    section.Name.decode("utf-8").strip("\x00"),
+                    section.Misc_VirtualSize,
+                    hex(section.VirtualAddress),
+                    section.SizeOfRawData,
+                    hex(section.PointerToRawData),
+                    f"{hex(section.Characteristics)} ({pe_obj.section_characteristics_str(i)})",
+                )
+            )
 
-        self.sections_group.view.setModel(table.TableModel(
-            sections_list, headers=["Name", "VirtualSize", "VirtualAddress", "SizeOfRawData", "PointerToRawData", "Characteristics"]))
+        self.sections_group.view.setModel(
+            table.TableModel(
+                sections_list,
+                headers=[
+                    "Name",
+                    "VirtualSize",
+                    "VirtualAddress",
+                    "SizeOfRawData",
+                    "PointerToRawData",
+                    "Characteristics",
+                ],
+            )
+        )

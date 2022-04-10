@@ -16,6 +16,7 @@ from . import helpers
 # Set the app ID on windows (helps with making sure icon is used)
 try:
     import ctypes
+
     appid = f"ajsmith.{helpers.APP_NAME_SHORT}.desktop.v1"
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(appid)
 except (AttributeError, OSError):
@@ -34,8 +35,7 @@ class ExeSpy(QtWidgets.QMainWindow):
 
         self.initial_style = self.app.style().name()
 
-        use_native_style = self.settings.value(
-            "view/native_style", False, bool)
+        use_native_style = self.settings.value("view/native_style", False, bool)
 
         if not use_native_style:
             self.app.setStyle("fusion")
@@ -45,8 +45,7 @@ class ExeSpy(QtWidgets.QMainWindow):
         self.setWindowTitle(helpers.APP_NAME)
 
         # Restore window geometry from settings
-        self.restoreGeometry(self.settings.value(
-            "view/geometry", QtCore.QByteArray()))
+        self.restoreGeometry(self.settings.value("view/geometry", QtCore.QByteArray()))
 
         self.tabview = tab_view.TabView(self)
 
@@ -92,7 +91,8 @@ class ExeSpy(QtWidgets.QMainWindow):
         main_widget.setLayout(main_layout)
 
         self.statusBar().setStyleSheet(
-            "QStatusBar QLabel { border-color: lightgray; border-style: solid; border-width: 0 1px 0 0; }")
+            "QStatusBar QLabel { border-color: lightgray; border-style: solid; border-width: 0 1px 0 0; }"
+        )
 
         # Create a container for the tab view
         tab_container = QtWidgets.QWidget()
@@ -101,7 +101,9 @@ class ExeSpy(QtWidgets.QMainWindow):
         tab_container.setLayout(tab_container_layout)
         tab_container_layout.addWidget(self.tabview)
         self.tabview.setSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.MinimumExpanding)
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.MinimumExpanding,
+        )
 
         self.setCentralWidget(main_widget)
 
@@ -115,7 +117,8 @@ class ExeSpy(QtWidgets.QMainWindow):
     def show_about(self):
         """Show the about dialog"""
         QtWidgets.QMessageBox().about(
-            self, f"About {helpers.APP_NAME}", helpers.ABOUT_TEXT)
+            self, f"About {helpers.APP_NAME}", helpers.ABOUT_TEXT
+        )
 
     def show_licenses(self):
         """Show the third-party license dialog"""
@@ -124,13 +127,16 @@ class ExeSpy(QtWidgets.QMainWindow):
 
     def show_open_file(self):
         """Show the open file dialog"""
-        file_selection = QtWidgets.QFileDialog.getOpenFileName(
-            self, "Open PE File")
+        file_selection = QtWidgets.QFileDialog.getOpenFileName(self, "Open PE File")
 
         self.statusBar().showMessage("Loading...")
         self.statusBar().repaint()
 
-        if isinstance(file_selection, tuple) and len(file_selection) > 0 and len(file_selection[0]) > 0:
+        if (
+            isinstance(file_selection, tuple)
+            and len(file_selection) > 0
+            and len(file_selection[0]) > 0
+        ):
             self.load_pe(file_selection[0])
 
         self.statusBar().clearMessage()
@@ -155,10 +161,12 @@ class ExeSpy(QtWidgets.QMainWindow):
             self.pe = pe_file.PEFile(path)
         except pefile.PEFormatError:
             helpers.show_message_box(
-                "Not a valid PE file", alert_type=helpers.MessageBoxTypes.CRITICAL)
+                "Not a valid PE file", alert_type=helpers.MessageBoxTypes.CRITICAL
+            )
         except FileNotFoundError:
             helpers.show_message_box(
-                "File not found", alert_type=helpers.MessageBoxTypes.CRITICAL)
+                "File not found", alert_type=helpers.MessageBoxTypes.CRITICAL
+            )
         else:
             self.tabview.load(self.pe)
 
@@ -181,6 +189,7 @@ def main():
     # Close the splash screen
     try:
         import pyi_splash  # type: ignore
+
         pyi_splash.close()
     except ImportError:
         pass

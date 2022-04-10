@@ -20,7 +20,8 @@ class HashesView(QtWidgets.QScrollArea):
 
         # File Hashes
         self.file_hashes_group = table.TableGroup(
-            "File Hashes", fit_columns=True, headers=["Type", "Hash"])
+            "File Hashes", fit_columns=True, headers=["Type", "Hash"]
+        )
         self.scroll_area.layout().addWidget(self.file_hashes_group)
 
         self.file_hashes_group.setFocus()
@@ -31,7 +32,8 @@ class HashesView(QtWidgets.QScrollArea):
         # File Hashes
         # TODO: CRC
         self.file_hashes_group.view.setModel(
-            table.TableModel(hashes, headers=["Type", "Hash"]))
+            table.TableModel(hashes, headers=["Type", "Hash"])
+        )
 
     def calculate_hashes(self, filename, pe_obj: pe_file.PEFile) -> "list[tuple]":
         """Calculate file hashes as a list of tuples."""
@@ -82,17 +84,17 @@ class HashesView(QtWidgets.QScrollArea):
             ("SHA3-512", hash_sha3_512.hexdigest()),
             ("BLAKE2s", hash_blake2s.hexdigest()),
             ("BLAKE2b", hash_blake2b.hexdigest()),
-            ("Imphash", pe_obj.pe.get_imphash())
+            ("Imphash", pe_obj.pe.get_imphash()),
         ]
 
 
 class crc32(object):
     # https://stackoverflow.com/questions/1742866/compute-crc-of-file-in-python
-    name = 'crc32'
+    name = "crc32"
     digest_size = 4
     block_size = 1
 
-    def __init__(self, arg=b''):
+    def __init__(self, arg=b""):
         self.__digest = 0
         self.update(arg)
 
@@ -105,7 +107,7 @@ class crc32(object):
         return self.__digest
 
     def hexdigest(self):
-        return '{:08x}'.format(self.__digest)
+        return "{:08x}".format(self.__digest)
 
     def update(self, arg):
-        self.__digest = zlib.crc32(arg, self.__digest) & 0xffffffff
+        self.__digest = zlib.crc32(arg, self.__digest) & 0xFFFFFFFF

@@ -34,7 +34,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
 def resource_path(relative_path: str) -> str:
-    """ Get absolute path to resource, works for dev and for PyInstaller """
+    """Get absolute path to resource, works for dev and for PyInstaller"""
     try:
         # PyInstaller creates a temp folder and stores path in _MEIPASS
         base_path = sys._MEIPASS
@@ -51,7 +51,12 @@ class MessageBoxTypes:
     QUESTION = (QtWidgets.QMessageBox.Question, "Question")
 
 
-def show_message_box(text: str, alert_type: MessageBoxTypes = MessageBoxTypes.INFORMATION, title: str = None) -> int:
+def show_message_box(
+    text: str,
+    alert_type: MessageBoxTypes = MessageBoxTypes.INFORMATION,
+    title: str = None,
+) -> int:
+    """Show a message box with the given text and alert type"""
     msgbox = QtWidgets.QMessageBox()
     if title is None:
         msgbox.setWindowTitle(alert_type[1])
@@ -65,7 +70,7 @@ def format_time(time: float):
 
     # TODO: Add option to change time format to local time
     # Format in local time
-    #time_tz = time_unaware.replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
+    # time_tz = time_unaware.replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
 
     # Format in UTC
     time_tz = time_unaware.replace(tzinfo=tz.tzutc())
