@@ -14,25 +14,25 @@ class ImportsView(QtWidgets.QScrollArea):
         self.setWidget(self.scroll_area)
         self.scroll_area.setLayout(QtWidgets.QFormLayout())
 
-        # Libraries
+        # Imports
         self.imports_group = table.TableGroup(
             "Imports", fit_columns=True, headers=["Name", "Library", "Address"])
         self.scroll_area.layout().addWidget(self.imports_group)
 
     def load(self, pe_obj: pe_file.PEFile):
-        # Libraries
+        # Imports
         imports_list = []
-        for import_obj in pe_obj.pe.DIRECTORY_ENTRY_IMPORT:
-            for import_func in import_obj.imports:
-                if import_func.name:
+
+        if hasattr(pe_obj.pe, "DIRECTORY_ENTRY_IMPORT"):
+            for import_obj in pe_obj.pe.DIRECTORY_ENTRY_IMPORT:
+                for import_func in import_obj.imports:
+                    if import_func.name:
+                        name = import_func.name.decode("utf-8").strip('\x00')
+                    else:
+                        name = f"[Ordinal {import_func.ordinal}]"
+
                     imports_list.append((
-                        import_func.name.decode("utf-8").strip('\x00'),
-                        import_obj.dll.decode("utf-8").strip('\x00'),
-                        hex(import_func.address)
-                    ))
-                else:
-                    imports_list.append((
-                        f"[Ordinal {import_func.ordinal}]",
+                        name,
                         import_obj.dll.decode("utf-8").strip('\x00'),
                         hex(import_func.address)
                     ))
