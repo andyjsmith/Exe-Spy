@@ -1,6 +1,5 @@
 import PySide6.QtWidgets as QtWidgets
 
-from .. import helpers
 from .. import pe_file
 from .components import table
 
