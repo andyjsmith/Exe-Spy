@@ -16,7 +16,7 @@ class ImportsView(QtWidgets.QScrollArea):
 
         # Libraries
         self.imports_group = table.TableGroup(
-            "Imports", fit_columns=True, headers=["Name", "Library"])
+            "Imports", fit_columns=True, headers=["Name", "Library", "Address"])
         self.scroll_area.layout().addWidget(self.imports_group)
 
     def load(self, pe_obj: pe_file.PEFile):
@@ -28,12 +28,14 @@ class ImportsView(QtWidgets.QScrollArea):
                     imports_list.append((
                         import_func.name.decode("utf-8").strip('\x00'),
                         import_obj.dll.decode("utf-8").strip('\x00'),
+                        hex(import_func.address)
                     ))
                 else:
                     imports_list.append((
                         f"[Ordinal {import_func.ordinal}]",
                         import_obj.dll.decode("utf-8").strip('\x00'),
+                        hex(import_func.address)
                     ))
 
         self.imports_group.view.setModel(table.TableModel(
-            imports_list, headers=["Name", "Library"]))
+            imports_list, headers=["Name", "Library", "Address"]))
