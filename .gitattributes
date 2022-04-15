@@ -1,1 +1,2 @@
 yara/** linguist-vendored
+*.yara -linguist-detectable
