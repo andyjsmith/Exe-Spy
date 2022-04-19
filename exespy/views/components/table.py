@@ -12,12 +12,16 @@ class TableGroup(QtWidgets.QGroupBox):
         fit_columns=False,
         headers=None,
         fit_to_contents=True,
+        expand_last_column=False,
         **kwargs
     ):
         super().__init__(title, *args, **kwargs)
 
         self.view = TableView(
-            fit_columns=fit_columns, headers=headers, fit_to_contents=fit_to_contents
+            fit_columns=fit_columns,
+            headers=headers,
+            fit_to_contents=fit_to_contents,
+            expand_last_column=expand_last_column,
         )
 
         self.setLayout(QtWidgets.QFormLayout())
@@ -81,6 +85,7 @@ class TableView(QtWidgets.QTableView):
         headers=None,
         fit_to_contents=True,
         first_column_scale=3,
+        expand_last_column=False,
         **kwargs
     ) -> None:
         super().__init__(*args, **kwargs)
@@ -89,13 +94,16 @@ class TableView(QtWidgets.QTableView):
         self.fit_columns = fit_columns
         self.fit_to_contents = fit_to_contents
         self.first_column_scale = first_column_scale
+        self.expand_last_column = expand_last_column
 
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.setVerticalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
+        self.setHorizontalScrollMode(QtWidgets.QAbstractItemView.ScrollPerPixel)
 
         if self.headers is None:
             self.horizontalHeader().hide()
 
-        self.horizontalHeader().setStretchLastSection(True)
+        self.horizontalHeader().setStretchLastSection(not self.expand_last_column)
         self.verticalHeader().hide()
 
         self.setSizePolicy(
@@ -111,10 +119,11 @@ class TableView(QtWidgets.QTableView):
         """Resize the table to fit its contents"""
 
         if self.fit_columns:
-            for col in range(self.horizontalHeader().count()):
-                self.horizontalHeader().setSectionResizeMode(
-                    col, QtWidgets.QHeaderView.ResizeToContents
-                )
+            # for col in range(self.horizontalHeader().count()):
+            #     self.horizontalHeader().setSectionResizeMode(
+            #         col, QtWidgets.QHeaderView.ResizeToContents
+            #     )
+            self.resizeColumnsToContents()
         else:
             self.setColumnWidth(0, self.width() / self.first_column_scale)
 
@@ -127,6 +136,8 @@ class TableView(QtWidgets.QTableView):
                     table_height += self.rowHeight(i)
 
             table_height += self.horizontalHeader().height()
+            if self.expand_last_column:
+                table_height += self.horizontalScrollBar().height()
 
             self.setMinimumHeight(table_height)
             self.setMaximumHeight(table_height)

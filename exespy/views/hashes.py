@@ -20,7 +20,10 @@ class HashesView(QtWidgets.QScrollArea):
 
         # File Hashes
         self.file_hashes_group = table.TableGroup(
-            "File Hashes", fit_columns=True, headers=["Type", "Hash"]
+            "File Hashes",
+            fit_columns=True,
+            headers=["Type", "Hash"],
+            expand_last_column=True,
         )
         self.scroll_area.layout().addWidget(self.file_hashes_group)
 
@@ -30,7 +33,6 @@ class HashesView(QtWidgets.QScrollArea):
         hashes = self.calculate_hashes(pe_obj.path, pe_obj)
 
         # File Hashes
-        # TODO: CRC
         self.file_hashes_group.view.setModel(
             table.TableModel(hashes, headers=["Type", "Hash"])
         )

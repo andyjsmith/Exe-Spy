@@ -4,20 +4,16 @@ from .. import pe_file
 from .components import table
 
 
-class SectionsView(QtWidgets.QScrollArea):
+class SectionsView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Set up scroll area
-        self.setWidgetResizable(True)
-        self.scroll_area = QtWidgets.QWidget(self)
-        self.setWidget(self.scroll_area)
-        self.scroll_area.setLayout(QtWidgets.QFormLayout())
+        self.setLayout(QtWidgets.QVBoxLayout())
 
         # Sections
-        self.sections_group = table.TableGroup(
-            "Sections",
+        self.sections_table = table.TableView(
             fit_columns=True,
+            fit_to_contents=False,
             headers=[
                 "Name",
                 "VirtualSize",
@@ -27,7 +23,8 @@ class SectionsView(QtWidgets.QScrollArea):
                 "Characteristics",
             ],
         )
-        self.scroll_area.layout().addWidget(self.sections_group)
+
+        self.layout().addWidget(self.sections_table)
 
     def load(self, pe_obj: pe_file.PEFile):
 
@@ -45,7 +42,7 @@ class SectionsView(QtWidgets.QScrollArea):
                 )
             )
 
-        self.sections_group.view.setModel(
+        self.sections_table.setModel(
             table.TableModel(
                 sections_list,
                 headers=[
@@ -58,3 +55,5 @@ class SectionsView(QtWidgets.QScrollArea):
                 ],
             )
         )
+
+        self.sections_table.resizeColumnsToContents()
