@@ -7,17 +7,13 @@ from .. import pe_file
 from .components import table
 
 
-class ResourcesView(QtWidgets.QScrollArea):
+class ResourcesView(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         self.pe_obj = None
 
-        # Set up scroll area
-        self.setWidgetResizable(True)
-        self.scroll_area = QtWidgets.QWidget(self)
-        self.setWidget(self.scroll_area)
-        self.scroll_area.setLayout(QtWidgets.QFormLayout())
+        self.setLayout(QtWidgets.QVBoxLayout())
 
         # Resources
         self.HEADERS = [
@@ -29,17 +25,15 @@ class ResourcesView(QtWidgets.QScrollArea):
             "Sublanguage",
             "Magic",
         ]
-        self.resources_group = table.TableGroup(
-            "Resources",
-            fit_columns=True,
+        self.resources_group = table.TableView(
+            fit_to_contents=False,
             headers=self.HEADERS,
         )
-        self.resources_group.view.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.resources_group.view.customContextMenuRequested.connect(
-            self.show_context_menu
-        )
 
-        self.scroll_area.layout().addWidget(self.resources_group)
+        self.resources_group.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.resources_group.customContextMenuRequested.connect(self.show_context_menu)
+
+        self.layout().addWidget(self.resources_group)
 
     def load(self, pe_obj: pe_file.PEFile):
         # Resources
@@ -60,7 +54,7 @@ class ResourcesView(QtWidgets.QScrollArea):
                 )
             )
 
-        self.resources_group.view.setModel(
+        self.resources_group.setModel(
             table.TableModel(resources_list, headers=self.HEADERS)
         )
 
@@ -68,10 +62,10 @@ class ResourcesView(QtWidgets.QScrollArea):
         """Show the context menu with a save button"""
         menu = QtWidgets.QMenu(self)
         save_action = QtGui.QAction("Save", self)
-        row = self.resources_group.view.rowAt(pos.y())
+        row = self.resources_group.rowAt(pos.y())
         save_action.triggered.connect(lambda: self.save_selected_resource(row))
         menu.addAction(save_action)
-        menu.popup(self.resources_group.view.viewport().mapToGlobal(pos))
+        menu.popup(self.resources_group.viewport().mapToGlobal(pos))
 
     def save_selected_resource(self, index):
         """Save the resource at an index to a file"""
