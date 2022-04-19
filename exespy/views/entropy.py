@@ -14,6 +14,7 @@ class EntropyView(QtWidgets.QWidget):
         super().__init__(*args, **kwargs)
 
         self.pe_obj: pe_file.PEFile = None
+        self.canvas = None
 
         self.setLayout(QtWidgets.QVBoxLayout())
 
@@ -27,6 +28,9 @@ class EntropyView(QtWidgets.QWidget):
 
         entropy = []
         addresses = []
+
+        if self.canvas is not None:
+            self.layout().removeWidget(self.canvas)
 
         with open(r"C:\Users\Andy\Downloads\notepad.exe", "rb") as f:
             data = f.read(BLOCK_SIZE)
@@ -63,18 +67,18 @@ class EntropyView(QtWidgets.QWidget):
         figure = Figure()
         plt.imshow(items, cmap="hot", interpolation="nearest")
         # plt.show()
-        canvas = FigureCanvasQTAgg(figure)
-        canvas.axes = figure.add_subplot()
-        canvas.axes.set_title("Entropy")
-        canvas.axes.set_xlabel("Address")
-        canvas.axes.set_ylabel("Shannon Entropy")
-        canvas.axes.set_ylim((0, 8))
-        canvas.axes.set_xlim((0, addresses[-1]))
-        canvas.axes.autoscale_view()
+        self.canvas = FigureCanvasQTAgg(figure)
+        self.canvas.axes = figure.add_subplot()
+        self.canvas.axes.set_title("Entropy")
+        self.canvas.axes.set_xlabel("Address")
+        self.canvas.axes.set_ylabel("Shannon Entropy")
+        self.canvas.axes.set_ylim((0, 8))
+        self.canvas.axes.set_xlim((0, addresses[-1]))
+        self.canvas.axes.autoscale_view()
         figure.subplots_adjust(left=0.05, right=0.95, top=0.95, bottom=0.05)
-        canvas.axes.plot(addresses, entropy)
+        self.canvas.axes.plot(addresses, entropy)
 
-        self.layout().addWidget(canvas)
+        self.layout().addWidget(self.canvas)
 
     def calc_entropy(self, data, unit="shannon"):
         """
