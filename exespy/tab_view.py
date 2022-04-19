@@ -20,6 +20,7 @@ from .views import (
     virustotal,
     disassembly,
     entropy,
+    manifest,
 )
 
 
@@ -64,6 +65,7 @@ class Tabs(enum.Enum):
     IMPORTS = enum.auto()
     EXPORTS = enum.auto()
     RESOURCES = enum.auto()
+    MANIFEST = enum.auto()
     STRINGS = enum.auto()
     HEXVIEW = enum.auto()
     HASHES = enum.auto()
@@ -112,6 +114,9 @@ class TabView(QtWidgets.QTabWidget):
 
         self.tabs[Tabs.RESOURCES] = resources.ResourcesView()
         self.addTab(self.tabs[Tabs.RESOURCES], "Resources")
+
+        self.tabs[Tabs.MANIFEST] = manifest.ManifestView()
+        self.addTab(self.tabs[Tabs.MANIFEST], "Manifest")
 
         self.tabs[Tabs.STRINGS] = strings.StringsView()
         self.addTab(self.tabs[Tabs.STRINGS], "Strings")
