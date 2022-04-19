@@ -140,14 +140,16 @@ class HexView(QtWidgets.QWidget):
     def bytes_to_str(self, data: bytes) -> str:
         """Convert a byte array to a string with printable characters"""
 
-        ascii_string = ""
-        for c in data:
-            if 33 <= c <= 126:
-                ascii_string += chr(c)
-            else:
-                ascii_string += "."
+        # ascii_string = ""
+        # for c in data:
+        #     if 33 <= c <= 126:
+        #         ascii_string += chr(c)
+        #     else:
+        #         ascii_string += "."
 
-        return ascii_string
+        # return ascii_string
+
+        return "".join(chr(c) if 33 <= c <= 126 else "." for c in data)
 
     def hex_selection_changed(self):
         """Select only by whole bytes in the hex panel"""
