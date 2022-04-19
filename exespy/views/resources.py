@@ -25,15 +25,15 @@ class ResourcesView(QtWidgets.QWidget):
             "Sublanguage",
             "Magic",
         ]
-        self.resources_group = table.TableView(
+        self.resources_table = table.TableView(
             fit_to_contents=False,
             headers=self.HEADERS,
         )
 
-        self.resources_group.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
-        self.resources_group.customContextMenuRequested.connect(self.show_context_menu)
+        self.resources_table.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.resources_table.customContextMenuRequested.connect(self.show_context_menu)
 
-        self.layout().addWidget(self.resources_group)
+        self.layout().addWidget(self.resources_table)
 
     def load(self, pe_obj: pe_file.PEFile):
         # Resources
@@ -54,7 +54,7 @@ class ResourcesView(QtWidgets.QWidget):
                 )
             )
 
-        self.resources_group.setModel(
+        self.resources_table.setModel(
             table.TableModel(resources_list, headers=self.HEADERS)
         )
 
@@ -62,10 +62,10 @@ class ResourcesView(QtWidgets.QWidget):
         """Show the context menu with a save button"""
         menu = QtWidgets.QMenu(self)
         save_action = QtGui.QAction("Save", self)
-        row = self.resources_group.rowAt(pos.y())
+        row = self.resources_table.rowAt(pos.y())
         save_action.triggered.connect(lambda: self.save_selected_resource(row))
         menu.addAction(save_action)
-        menu.popup(self.resources_group.viewport().mapToGlobal(pos))
+        menu.popup(self.resources_table.viewport().mapToGlobal(pos))
 
     def save_selected_resource(self, index):
         """Save the resource at an index to a file"""
