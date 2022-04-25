@@ -120,7 +120,6 @@ class TabView(QtWidgets.QTabWidget):
             if hasattr(tab, "load"):
                 if hasattr(tab, "LOAD_ASYNC") and tab.LOAD_ASYNC:
                     # Asynchronous load
-                    # TODO: async load
                     tab.load_thread = QtCore.QThread()
                     tab.load_worker = LoadWorker(tab, pe)
                     tab.load_worker.moveToThread(tab.load_thread)
