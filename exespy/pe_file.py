@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import hashlib
 import os
 
 import pefile
@@ -31,6 +32,8 @@ class PEFile:
         self.lief_obj = lief.parse(path)
         # TODO: this is a very slow operation, any way to speed up checksum generation?
         self.calculated_checksum = self.pe.generate_checksum()
+
+        self.sha256 = self.calculate_sha256()
 
         self.resources = self.get_resources()
 
@@ -230,3 +233,13 @@ class PEFile:
                 )
 
         return strings
+
+    def calculate_sha256(self) -> str:
+        """Generate a SHA256 hash of the PE file"""
+        sha256 = hashlib.sha256()
+        # Calculate the hashes while only looping through the file once
+        with open(self.path, "rb") as f:
+            # Read the file in chunks of 4096 bytes
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256.update(byte_block)
+        return sha256.hexdigest()

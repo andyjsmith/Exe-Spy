@@ -70,6 +70,13 @@ class ExeSpy(QtWidgets.QMainWindow):
         view_menu.addAction(self.native_style_action)
         self.menuBar().addMenu(view_menu)
 
+        # Set up options menu
+        options_menu = QtWidgets.QMenu("&Options", self)
+        vt_api_key_action = QtGui.QAction("Set VirusTotal API Key", self)
+        vt_api_key_action.triggered.connect(self.show_vt_api_key)
+        options_menu.addAction(vt_api_key_action)
+        self.menuBar().addMenu(options_menu)
+
         # Set up help menu
         help_menu = QtWidgets.QMenu("&Help", self)
         about_action = QtGui.QAction("About", self)
@@ -140,6 +147,18 @@ class ExeSpy(QtWidgets.QMainWindow):
             self.load_pe(file_selection[0])
 
         self.statusBar().clearMessage()
+
+    def show_vt_api_key(self):
+        """Show the VirusTotal API key dialog"""
+        api_key = QtWidgets.QInputDialog.getText(
+            self,
+            "Set VirusTotal API Key",
+            "API Key",
+            text=self.settings.value("virustotal/api_key", ""),
+        )
+
+        if api_key[1]:
+            self.settings.setValue("virustotal/api_key", api_key[0])
 
     def toggle_style(self):
         """Toggle the application style between native and fusion"""

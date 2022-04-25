@@ -65,13 +65,18 @@ def show_message_box(
     return msgbox.exec()
 
 
-def format_time(time: float):
-    time_unaware = datetime.datetime.utcfromtimestamp(time)
+def format_time(time: "int|float|datetime.datetime") -> str:
+    if time is None:
+        return ""
+
+    # Convert int/float to datetime
+    if not isinstance(time, datetime.datetime):
+        time = datetime.datetime.utcfromtimestamp(time)
 
     # TODO: Add option to change time format to local time
     # Format in local time
     # time_tz = time_unaware.replace(tzinfo=tz.tzutc()).astimezone(tz.tzlocal())
 
     # Format in UTC
-    time_tz = time_unaware.replace(tzinfo=tz.tzutc())
+    time_tz = time.replace(tzinfo=tz.tzutc())
     return time_tz.strftime("%Y-%m-%d %H:%M:%S %Z")
