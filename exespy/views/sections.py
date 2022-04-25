@@ -5,6 +5,8 @@ from .components import table
 
 
 class SectionsView(QtWidgets.QWidget):
+    NAME = "Sections"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

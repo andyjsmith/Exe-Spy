@@ -1,16 +1,22 @@
-from email import header
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtGui as QtGui
 import PySide6.QtCore as QtCore
 
 from .. import helpers
 from .. import pe_file
+from .. import state
 from .components import table
 
 
 class StringsView(QtWidgets.QWidget):
+    NAME = "Strings"
+    LOAD_ASYNC = True
+    SHOW_PROGRESS = True
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.loaded = False
 
         self.setLayout(QtWidgets.QVBoxLayout())
 
@@ -54,21 +60,31 @@ class StringsView(QtWidgets.QWidget):
 
         self.layout().addWidget(self.table_view)
 
-    def load(self, pe_obj: pe_file.PEFile):
+    def load_async(self, pe_obj: pe_file.PEFile):
         self.pe = pe_obj
         self.table_model = table.TableModel(
             pe_obj.strings(min_length=self.search_minimum.value()),
             headers=["String", "Offset"],
             hex_columns=[1],
         )
+
         self.table_proxy = QtCore.QSortFilterProxyModel()
         self.table_proxy.setSourceModel(self.table_model)
         self.table_proxy.setSortRole(QtCore.Qt.UserRole)
         self.table_proxy.setFilterKeyColumn(0)
         self.table_proxy.setSortCaseSensitivity(QtCore.Qt.CaseInsensitive)
+
+    def load_finalize(self):
         self.table_view.setModel(self.table_proxy)
         self.table_view.fit_contents()
         self.handle_case_sensitive_change()
+
+    def enable_tab(self):
+        state.tabview.set_loading(self.NAME, False)
+
+    def load(self, pe_obj: pe_file.PEFile):
+        self.load_async(pe_obj)
+        self.load_finalize()
 
     def handle_search_change(self):
         search_text = self.search_box.text()
@@ -92,5 +108,7 @@ class StringsView(QtWidgets.QWidget):
         self.handle_search_change()
 
     def handle_minimum_change(self):
+        progress = helpers.progress_dialog(f"Loading {self.NAME}...", "Loading", self)
         self.load(self.pe)
         self.handle_search_change()
+        progress.close()

@@ -5,12 +5,15 @@ import PySide6.QtGui as QtGui
 import humanize
 import icoextract
 
+from . import view
 from .. import helpers
 from .. import pe_file
 from .components import table
 
 
 class GeneralView(QtWidgets.QScrollArea):
+    NAME = "General"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

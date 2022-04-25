@@ -5,12 +5,19 @@ import PySide6.QtWidgets as QtWidgets
 
 from .. import helpers
 from .. import pe_file
+from .. import state
 from .components import table
 
 
 class HashesView(QtWidgets.QScrollArea):
+    NAME = "Hashes"
+    LOAD_ASYNC = True
+    SHOW_PROGRESS = False
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.loaded = False
 
         # Set up scroll area
         self.setWidgetResizable(True)
@@ -29,13 +36,21 @@ class HashesView(QtWidgets.QScrollArea):
 
         self.file_hashes_group.setFocus()
 
-    def load(self, pe_obj: pe_file.PEFile):
-        hashes = self.calculate_hashes(pe_obj.path, pe_obj)
+    def load_async(self, pe_obj: pe_file.PEFile):
+        self.hashes = self.calculate_hashes(pe_obj.path, pe_obj)
 
+    def load_finalize(self):
         # File Hashes
         self.file_hashes_group.view.setModel(
-            table.TableModel(hashes, headers=["Type", "Hash"])
+            table.TableModel(self.hashes, headers=["Type", "Hash"])
         )
+
+    def enable_tab(self):
+        state.tabview.set_loading(self.NAME, False)
+
+    def load(self, pe_obj: pe_file.PEFile):
+        self.load_async(pe_obj)
+        self.load_finalize()
 
     def calculate_hashes(self, filename, pe_obj: pe_file.PEFile) -> "list[tuple]":
         """Calculate file hashes as a list of tuples."""

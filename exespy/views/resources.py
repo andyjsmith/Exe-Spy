@@ -8,6 +8,8 @@ from .components import table
 
 
 class ResourcesView(QtWidgets.QWidget):
+    NAME = "Resources"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

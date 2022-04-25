@@ -4,13 +4,20 @@ import PySide6.QtCore as QtCore
 import PySide6.QtGui as QtGui
 
 from .. import pe_file
+from .. import state
 
 from .components import textedit
 
 
 class HexView(QtWidgets.QWidget):
+    NAME = "Hex View"
+    LOAD_ASYNC = True
+    SHOW_PROGRESS = True
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.loaded = False
 
         self.setLayout(QtWidgets.QGridLayout())
 
@@ -92,7 +99,7 @@ class HexView(QtWidgets.QWidget):
         self.hex_panel.setPalette(palette_match_active_highlight)
         self.text_panel.setPalette(palette_match_active_highlight)
 
-    def load(self, pe_obj: pe_file.PEFile):
+    def load_async(self, pe_obj: pe_file.PEFile):
         self.pe_obj = pe_obj
 
         if pe_obj is None:
@@ -104,24 +111,29 @@ class HexView(QtWidgets.QWidget):
         # Minumum length is 4 bytes, but will increase for larger files
         NUM_ADDRESS_CHARS = max(8, len("{:X}".format(pe_obj.stat.st_size)))
 
-        address_values = []
-        hex_values = []
-        text_values = []
+        self.address_values = []
+        self.hex_values = []
+        self.text_values = []
 
         with open(pe_obj.path, "rb") as f:
             data = f.read(BYTES_PER_LINE)
             while data:
-                address_values.append(
+                self.address_values.append(
                     "{0:0{1}X}".format(f.tell() - BYTES_PER_LINE, NUM_ADDRESS_CHARS)
                 )
-                hex_values.append(" ".join(["{:02x}".format(x) for x in data]))
-                text_values.append(self.bytes_to_str(data))
+                self.hex_values.append(" ".join(["{:02x}".format(x) for x in data]))
+                self.text_values.append(self.bytes_to_str(data))
 
                 data = f.read(BYTES_PER_LINE)
 
-        self.address_panel.setPlainText("\n".join(address_values))
-        self.hex_panel.setPlainText("\n".join(hex_values))
-        self.text_panel.setPlainText("\n".join(text_values))
+        self.address_values_text = "\n".join(self.address_values)
+        self.hex_values_text = "\n".join(self.hex_values)
+        self.text_values_text = "\n".join(self.text_values)
+
+    def load_finalize(self):
+        self.address_panel.setPlainText(self.address_values_text)
+        self.hex_panel.setPlainText(self.hex_values_text)
+        self.text_panel.setPlainText(self.text_values_text)
 
         # Set width of address and hex panels to match their text
         font = self.address_panel.font()
@@ -136,6 +148,13 @@ class HexView(QtWidgets.QWidget):
         w = textSize.width() + 10
         self.hex_panel.setMinimumWidth(w)
         self.hex_panel.setMaximumWidth(w)
+
+    def enable_tab(self):
+        state.tabview.set_loading(self.NAME, False)
+
+    def load(self, pe_obj: pe_file.PEFile):
+        self.load_async(pe_obj)
+        self.load_finalize()
 
     def bytes_to_str(self, data: bytes) -> str:
         """Convert a byte array to a string with printable characters"""

@@ -5,6 +5,8 @@ from .components import table
 
 
 class LibrariesView(QtWidgets.QScrollArea):
+    NAME = "Libraries"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

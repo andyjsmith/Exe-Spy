@@ -4,14 +4,21 @@ import PySide6.QtCore as QtCore
 
 import iced_x86
 
+from .. import state
 from .. import pe_file
 from .. import helpers
 from .components import textedit
 
 
 class DisassemblyView(QtWidgets.QWidget):
+    NAME = "Disassembly"
+    LOAD_ASYNC = True
+    SHOW_PROGRESS = True
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.loaded = False
 
         self.pe_obj: pe_file.PEFile = None
         self.assembly: "list[str]" = None
@@ -60,7 +67,7 @@ class DisassemblyView(QtWidgets.QWidget):
         self.text_edit = textedit.MonoTextEdit()
         self.layout().addWidget(self.text_edit)
 
-    def load(self, pe_obj: pe_file.PEFile):
+    def load_async(self, pe_obj: pe_file.PEFile):
         self.pe_obj = pe_obj
 
         if pe_obj is None:
@@ -84,7 +91,17 @@ class DisassemblyView(QtWidgets.QWidget):
             syntax=syntax,
         )
 
-        self.text_edit.setPlainText("\n".join(self.assembly))
+        self.assembly_text = "\n".join(self.assembly)
+
+    def load_finalize(self):
+        self.text_edit.setPlainText(self.assembly_text)
+
+    def enable_tab(self):
+        state.tabview.set_loading(self.NAME, False)
+
+    def load(self, pe_obj: pe_file.PEFile):
+        self.load_async(pe_obj)
+        self.load_finalize()
 
     def get_disassembly(
         self,

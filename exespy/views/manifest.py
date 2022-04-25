@@ -8,6 +8,8 @@ from .components import textedit
 
 
 class ManifestView(QtWidgets.QWidget):
+    NAME = "Manifest"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

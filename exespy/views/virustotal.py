@@ -10,6 +10,8 @@ from .components import table
 
 
 class VirusTotalView(QtWidgets.QScrollArea):
+    NAME = "VirusTotal"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

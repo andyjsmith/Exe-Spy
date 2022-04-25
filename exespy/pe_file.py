@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import hashlib
 import os
+import time
 
 import pefile
 import lief
@@ -31,7 +32,9 @@ class PEFile:
         self.pe = pefile.PE(path)
         self.lief_obj = lief.parse(path)
         # TODO: this is a very slow operation, any way to speed up checksum generation?
-        self.calculated_checksum = self.pe.generate_checksum()
+        start = time.time()
+        self.calculated_checksum = 0
+        print(f"Generated checksum in {time.time() - start} seconds")
 
         self.sha256 = self.calculate_sha256()
 

@@ -6,11 +6,18 @@ import yara
 
 from .. import pe_file
 from .components import table
+from .. import state
 
 
 class PackersView(QtWidgets.QWidget):
+    NAME = "Packers"
+    LOAD_ASYNC = True
+    SHOW_PROGRESS = False
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        self.loaded = False
 
         self.pe_obj = None
 
@@ -29,9 +36,9 @@ class PackersView(QtWidgets.QWidget):
 
         self.layout().addWidget(self.packers_table)
 
-    def load(self, pe_obj: pe_file.PEFile):
+    def load_async(self, pe_obj: pe_file.PEFile):
         # Packers
-        matches_list = []
+        self.matches_list = []
 
         # rules = yara.compile(
         #     filepaths={
@@ -53,10 +60,18 @@ class PackersView(QtWidgets.QWidget):
             else:
                 name = match.rule
 
-            matches_list.append((name, match.namespace))
+            self.matches_list.append((name, match.namespace))
 
+    def load_finalize(self):
         self.packers_table.setModel(
-            table.TableModel(matches_list, headers=self.HEADERS)
+            table.TableModel(self.matches_list, headers=self.HEADERS)
         )
 
         self.packers_table.fit_contents()
+
+    def enable_tab(self):
+        state.tabview.set_loading(self.NAME, False)
+
+    def load(self, pe_obj: pe_file.PEFile):
+        self.load_async(pe_obj)
+        self.load_finalize()

@@ -1,9 +1,11 @@
 import enum
+import time
 from typing import Dict
 import PySide6.QtCore as QtCore
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtGui as QtGui
 
+from . import helpers
 from . import pe_file
 from .views import (
     view,
@@ -23,6 +25,19 @@ from .views import (
     manifest,
     packers,
 )
+
+
+class LoadWorker(QtCore.QObject):
+    finished = QtCore.Signal()
+
+    def __init__(self, tab: QtWidgets.QWidget, pe: pe_file.PEFile):
+        super().__init__()
+        self.tab = tab
+        self.pe = pe
+
+    def run(self):
+        self.tab.load_async(self.pe)
+        self.finished.emit()
 
 
 class TabBar(QtWidgets.QTabBar):
@@ -58,24 +73,6 @@ class TabBar(QtWidgets.QTabBar):
             painter.restore()
 
 
-class Tabs(enum.Enum):
-    GENERAL = enum.auto()
-    HEADERS = enum.auto()
-    SECTIONS = enum.auto()
-    LIBRARIES = enum.auto()
-    IMPORTS = enum.auto()
-    EXPORTS = enum.auto()
-    RESOURCES = enum.auto()
-    MANIFEST = enum.auto()
-    STRINGS = enum.auto()
-    HEXVIEW = enum.auto()
-    HASHES = enum.auto()
-    DISASSEMBLY = enum.auto()
-    PACKERS = enum.auto()
-    ENTROPY = enum.auto()
-    VIRUSTOTAL = enum.auto()
-
-
 class TabView(QtWidgets.QTabWidget):
     """Tab view that acts as the main view controller"""
 
@@ -85,63 +82,99 @@ class TabView(QtWidgets.QTabWidget):
         self.setTabBar(TabBar(self))
         self.setTabPosition(self.TabPosition.West)
 
-        self.tabs: Dict[Tabs, view.View] = {}
+        self.tabs: Dict[str, view.View] = {}
 
-        self.tabs[Tabs.GENERAL] = general.GeneralView()
-        self.addTab(self.tabs[Tabs.GENERAL], "General")
-        self.tabBar().setTabTextColor(
-            self.indexOf(self.tabs[Tabs.GENERAL]), QtGui.QColor(255, 0, 0)
-        )
+        self.currentChanged.connect(self.on_tab_change)
 
-        self.tabs[Tabs.HEADERS] = headers.HeadersView()
-        self.addTab(self.tabs[Tabs.HEADERS], "Headers")
-
-        self.tabs[Tabs.SECTIONS] = sections.SectionsView()
-        self.addTab(self.tabs[Tabs.SECTIONS], "Sections")
-        self.tabBar().setTabTextColor(
-            self.indexOf(self.tabs[Tabs.SECTIONS]), QtGui.QColor(150, 150, 150)
-        )
-        # self.tabBar().setTabEnabled(self.indexOf(
-        #     self.tabs[Tabs.SECTIONS]), False)
-
-        self.tabs[Tabs.LIBRARIES] = libraries.LibrariesView()
-        self.addTab(self.tabs[Tabs.LIBRARIES], "Libraries")
-
-        self.tabs[Tabs.IMPORTS] = imports.ImportsView()
-        self.addTab(self.tabs[Tabs.IMPORTS], "Imports")
-
-        self.tabs[Tabs.EXPORTS] = exports.ExportsView()
-        self.addTab(self.tabs[Tabs.EXPORTS], "Exports")
-
-        self.tabs[Tabs.RESOURCES] = resources.ResourcesView()
-        self.addTab(self.tabs[Tabs.RESOURCES], "Resources")
-
-        self.tabs[Tabs.MANIFEST] = manifest.ManifestView()
-        self.addTab(self.tabs[Tabs.MANIFEST], "Manifest")
-
-        self.tabs[Tabs.STRINGS] = strings.StringsView()
-        self.addTab(self.tabs[Tabs.STRINGS], "Strings")
-
-        # self.tabs[Tabs.HEXVIEW] = hexview.HexView()
-        # self.addTab(self.tabs[Tabs.HEXVIEW], "Hex View")
-
-        self.tabs[Tabs.HASHES] = hashes.HashesView()
-        self.addTab(self.tabs[Tabs.HASHES], "Hashes")
-
-        # self.tabs[Tabs.DISASSEMBLY] = disassembly.DisassemblyView()
-        # self.addTab(self.tabs[Tabs.DISASSEMBLY], "Disassembly")
-
-        self.tabs[Tabs.PACKERS] = packers.PackersView()
-        self.addTab(self.tabs[Tabs.PACKERS], "Packers")
-
-        self.tabs[Tabs.ENTROPY] = entropy.EntropyView()
-        self.addTab(self.tabs[Tabs.ENTROPY], "Entropy")
-
-        self.tabs[Tabs.VIRUSTOTAL] = virustotal.VirusTotalView()
-        self.addTab(self.tabs[Tabs.VIRUSTOTAL], "VirusTotal")
+        self.add_tab(general.GeneralView())
+        self.add_tab(headers.HeadersView())
+        self.add_tab(sections.SectionsView())
+        self.add_tab(libraries.LibrariesView())
+        self.add_tab(imports.ImportsView())
+        self.add_tab(exports.ExportsView())
+        self.add_tab(resources.ResourcesView())
+        self.add_tab(manifest.ManifestView())
+        self.add_tab(strings.StringsView())
+        self.add_tab(hexview.HexView())
+        self.add_tab(hashes.HashesView())
+        self.add_tab(disassembly.DisassemblyView())
+        self.add_tab(packers.PackersView())
+        self.add_tab(entropy.EntropyView())
+        self.add_tab(virustotal.VirusTotalView())
 
     def load(self, pe: pe_file.PEFile):
-        # Loop through all tabs and call their update function
-        for tab in self.tabs.values():
+        """Loop through all tabs and call their update function"""
+        self.window().statusBar().showMessage("Loading...")
+        self.window().progress_bar.setMaximum(len(self.tabs))
+        self.window().progress_bar.show()
+
+        # Set loading state of tabs
+        for tab_name, tab in self.tabs.items():
+            if hasattr(tab, "LOAD_ASYNC") and tab.LOAD_ASYNC:
+                self.set_loading(tab_name, True)
+
+        # Load tabs (sync and async)
+        i = 0
+        for tab_name, tab in self.tabs.items():
+            start = time.time()
             if hasattr(tab, "load"):
-                tab.load(pe)
+                if hasattr(tab, "LOAD_ASYNC") and tab.LOAD_ASYNC:
+                    # Asynchronous load
+                    # TODO: async load
+                    tab.load_thread = QtCore.QThread()
+                    tab.load_worker = LoadWorker(tab, pe)
+                    tab.load_worker.moveToThread(tab.load_thread)
+                    tab.load_thread.started.connect(tab.load_worker.run)
+                    tab.load_worker.finished.connect(tab.load_thread.quit)
+                    tab.load_worker.finished.connect(tab.load_worker.deleteLater)
+                    tab.load_thread.finished.connect(tab.load_thread.deleteLater)
+                    self.set_loading(tab_name, True)
+                    tab.load_thread.start()
+                    tab.load_thread.finished.connect(tab.enable_tab)
+                else:
+                    # Synchronous load
+                    tab.load(pe)
+            end = time.time()
+            print(f"{tab_name} took {end - start} seconds to load")
+            i += 1
+            self.window().progress_bar.setValue(i)
+            self.window().statusBar().repaint()
+            QtCore.QCoreApplication.processEvents()
+
+        self.window().progress_bar.hide()
+        self.window().statusBar().clearMessage()
+
+    def add_tab(self, view: QtWidgets.QWidget):
+        """Add a tab to the view"""
+        self.tabs[view.NAME] = view
+        self.addTab(self.tabs[view.NAME], view.NAME)
+
+    def set_loading(self, tab: str, loading: bool):
+        """Set the loading state of a tab"""
+        if loading:
+            self.tabBar().setTabTextColor(
+                self.indexOf(self.tabs[tab]), QtGui.QColor(150, 150, 150)
+            )
+            self.tabBar().setTabEnabled(self.indexOf(self.tabs[tab]), False)
+            self.tabBar().setTabText(self.indexOf(self.tabs[tab]), f"{tab}...")
+        else:
+            self.tabBar().setTabTextColor(
+                self.indexOf(self.tabs[tab]), QtGui.QColor(0, 0, 0)
+            )
+            self.tabBar().setTabEnabled(self.indexOf(self.tabs[tab]), True)
+            self.tabBar().setTabText(self.indexOf(self.tabs[tab]), tab)
+
+    def on_tab_change(self, index: int):
+        """Called when a tab is changed"""
+        tab = self.tabs[self.tabText(index)]
+        if hasattr(tab, "load_finalize") and tab.loaded == False:
+            if tab.SHOW_PROGRESS:
+                progress = helpers.progress_dialog(
+                    f"Loading {tab.NAME}...", "Loading", self
+                )
+
+            tab.load_finalize()
+
+            if tab.SHOW_PROGRESS:
+                progress.close()
+                tab.loaded = True

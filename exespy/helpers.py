@@ -3,9 +3,8 @@ import sys
 import datetime
 from dateutil import tz
 
-import pefile
-
 import PySide6.QtWidgets as QtWidgets
+import PySide6.QtCore as QtCore
 
 
 APP_NAME = "Exe Spy"
@@ -63,6 +62,16 @@ def show_message_box(
     msgbox.setText(text)
     msgbox.setIcon(alert_type[0])
     return msgbox.exec()
+
+
+def progress_dialog(
+    text: str, title: str = None, parent: QtWidgets.QWidget = None
+) -> QtWidgets.QProgressDialog:
+    progress = QtWidgets.QProgressDialog(text, title, 0, 0, parent)
+    progress.setCancelButton(None)
+    progress.show()
+    QtCore.QCoreApplication.processEvents()
+    return progress
 
 
 def format_time(time: "int|float|datetime.datetime") -> str:

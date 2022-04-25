@@ -11,6 +11,7 @@ from . import pe_file
 from . import tab_view
 from . import license_dialog
 from . import helpers
+from . import state
 
 
 # Set the app ID on windows (helps with making sure icon is used)
@@ -47,7 +48,12 @@ class ExeSpy(QtWidgets.QMainWindow):
         # Restore window geometry from settings
         self.restoreGeometry(self.settings.value("view/geometry", QtCore.QByteArray()))
 
-        self.tabview = tab_view.TabView(self)
+        self.progress_bar = QtWidgets.QProgressBar(self.statusBar())
+        self.progress_bar.setMaximumWidth(100)
+        self.progress_bar.hide()
+        self.statusBar().addPermanentWidget(self.progress_bar)
+
+        state.tabview = tab_view.TabView(self)
 
         # Set up file menu
         file_menu = QtWidgets.QMenu("&File", self)
@@ -106,8 +112,8 @@ class ExeSpy(QtWidgets.QMainWindow):
         tab_container_layout = QtWidgets.QVBoxLayout(tab_container)
         tab_container_layout.setContentsMargins(0, 0, 0, 0)
         tab_container.setLayout(tab_container_layout)
-        tab_container_layout.addWidget(self.tabview)
-        self.tabview.setSizePolicy(
+        tab_container_layout.addWidget(state.tabview)
+        state.tabview.setSizePolicy(
             QtWidgets.QSizePolicy.MinimumExpanding,
             QtWidgets.QSizePolicy.MinimumExpanding,
         )
@@ -115,11 +121,6 @@ class ExeSpy(QtWidgets.QMainWindow):
         self.setCentralWidget(main_widget)
 
         main_layout.addWidget(tab_container)
-
-        self.progress_bar = QtWidgets.QProgressBar(self.statusBar())
-        self.progress_bar.setMaximumWidth(100)
-        self.progress_bar.hide()
-        self.statusBar().addPermanentWidget(self.progress_bar)
 
     def show_about(self):
         """Show the about dialog"""
@@ -135,9 +136,6 @@ class ExeSpy(QtWidgets.QMainWindow):
     def show_open_file(self):
         """Show the open file dialog"""
         file_selection = QtWidgets.QFileDialog.getOpenFileName(self, "Open PE File")
-
-        self.statusBar().showMessage("Loading...")
-        self.statusBar().repaint()
 
         if (
             isinstance(file_selection, tuple)
@@ -187,7 +185,7 @@ class ExeSpy(QtWidgets.QMainWindow):
                 "File not found", alert_type=helpers.MessageBoxTypes.CRITICAL
             )
         else:
-            self.tabview.load(self.pe)
+            state.tabview.load(self.pe)
 
 
 def main():

@@ -5,6 +5,8 @@ from .components import table
 
 
 class ExportsView(QtWidgets.QScrollArea):
+    NAME = "Exports"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

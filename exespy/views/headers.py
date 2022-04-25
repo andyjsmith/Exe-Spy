@@ -6,6 +6,8 @@ from .components import table
 
 
 class HeadersView(QtWidgets.QScrollArea):
+    NAME = "Headers"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
