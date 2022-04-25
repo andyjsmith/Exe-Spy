@@ -21,6 +21,7 @@ from .views import (
     disassembly,
     entropy,
     manifest,
+    packers,
 )
 
 
@@ -121,16 +122,16 @@ class TabView(QtWidgets.QTabWidget):
         self.tabs[Tabs.STRINGS] = strings.StringsView()
         self.addTab(self.tabs[Tabs.STRINGS], "Strings")
 
-        self.tabs[Tabs.HEXVIEW] = hexview.HexView()
-        self.addTab(self.tabs[Tabs.HEXVIEW], "Hex View")
+        # self.tabs[Tabs.HEXVIEW] = hexview.HexView()
+        # self.addTab(self.tabs[Tabs.HEXVIEW], "Hex View")
 
         self.tabs[Tabs.HASHES] = hashes.HashesView()
         self.addTab(self.tabs[Tabs.HASHES], "Hashes")
 
-        self.tabs[Tabs.DISASSEMBLY] = disassembly.DisassemblyView()
-        self.addTab(self.tabs[Tabs.DISASSEMBLY], "Disassembly")
+        # self.tabs[Tabs.DISASSEMBLY] = disassembly.DisassemblyView()
+        # self.addTab(self.tabs[Tabs.DISASSEMBLY], "Disassembly")
 
-        self.tabs[Tabs.PACKERS] = QtWidgets.QWidget()
+        self.tabs[Tabs.PACKERS] = packers.PackersView()
         self.addTab(self.tabs[Tabs.PACKERS], "Packers")
 
         self.tabs[Tabs.ENTROPY] = entropy.EntropyView()

@@ -1,3 +1,0 @@
-These yara files are from:
-- https://github.com/godaddy/yara-rules
-- https://github.com/Yara-Rules/rules
