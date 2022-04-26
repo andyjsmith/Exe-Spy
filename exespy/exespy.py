@@ -175,6 +175,10 @@ class ExeSpy(QtWidgets.QMainWindow):
     def load_pe(self, path: str):
         """Load a PE file and begin parsing"""
         try:
+            self.progress_bar.show()
+            self.progress_bar.setValue(0)
+            self.statusBar().showMessage("Loading...")
+            QtCore.QCoreApplication.processEvents()
             self.pe = pe_file.PEFile(path)
         except pefile.PEFormatError:
             helpers.show_message_box(
@@ -186,6 +190,9 @@ class ExeSpy(QtWidgets.QMainWindow):
             )
         else:
             state.tabview.load(self.pe)
+        finally:
+            self.statusBar().clearMessage()
+            self.progress_bar.hide()
 
 
 def main():

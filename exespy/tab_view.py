@@ -102,11 +102,14 @@ class TabView(QtWidgets.QTabWidget):
         self.add_tab(entropy.EntropyView())
         self.add_tab(virustotal.VirusTotalView())
 
+        # Disable all tabs except general
+        for tab_name, tab in self.tabs.items():
+            if tab_name != general.GeneralView.NAME:
+                self.set_disabled(tab_name, True)
+
     def load(self, pe: pe_file.PEFile):
         """Loop through all tabs and call their update function"""
-        self.window().statusBar().showMessage("Loading...")
         self.window().progress_bar.setMaximum(len(self.tabs))
-        self.window().progress_bar.show()
 
         # Set loading state of tabs
         for tab_name, tab in self.tabs.items():
@@ -133,6 +136,7 @@ class TabView(QtWidgets.QTabWidget):
                 else:
                     # Synchronous load
                     tab.load(pe)
+                    self.set_disabled(tab_name, False)
             end = time.time()
             print(f"{tab_name} took {end - start} seconds to load")
             i += 1
@@ -151,17 +155,24 @@ class TabView(QtWidgets.QTabWidget):
     def set_loading(self, tab: str, loading: bool):
         """Set the loading state of a tab"""
         if loading:
+            self.set_disabled(tab, True)
+            self.tabBar().setTabText(self.indexOf(self.tabs[tab]), f"{tab}...")
+        else:
+            self.set_disabled(tab, False)
+            self.tabBar().setTabText(self.indexOf(self.tabs[tab]), tab)
+
+    def set_disabled(self, tab: str, disabled: bool):
+        """Set the disabled state of a tab"""
+        if disabled:
             self.tabBar().setTabTextColor(
                 self.indexOf(self.tabs[tab]), QtGui.QColor(150, 150, 150)
             )
             self.tabBar().setTabEnabled(self.indexOf(self.tabs[tab]), False)
-            self.tabBar().setTabText(self.indexOf(self.tabs[tab]), f"{tab}...")
         else:
             self.tabBar().setTabTextColor(
                 self.indexOf(self.tabs[tab]), QtGui.QColor(0, 0, 0)
             )
             self.tabBar().setTabEnabled(self.indexOf(self.tabs[tab]), True)
-            self.tabBar().setTabText(self.indexOf(self.tabs[tab]), tab)
 
     def on_tab_change(self, index: int):
         """Called when a tab is changed"""

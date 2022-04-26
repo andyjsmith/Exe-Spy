@@ -19,6 +19,8 @@ class HashesView(QtWidgets.QScrollArea):
 
         self.loaded = False
 
+        self.pe_obj = None
+
         # Set up scroll area
         self.setWidgetResizable(True)
         self.scroll_area = QtWidgets.QWidget(self)
@@ -34,15 +36,48 @@ class HashesView(QtWidgets.QScrollArea):
         )
         self.scroll_area.layout().addWidget(self.file_hashes_group)
 
+        # Other Hashes
+        self.other_hashes_group = table.TableGroup(
+            "Other Hashes",
+            fit_columns=True,
+            headers=["Type", "Hash"],
+            expand_last_column=True,
+        )
+        self.scroll_area.layout().addWidget(self.other_hashes_group)
+
         self.file_hashes_group.setFocus()
 
     def load_async(self, pe_obj: pe_file.PEFile):
+        self.pe_obj = pe_obj
         self.hashes = self.calculate_hashes(pe_obj.path, pe_obj)
 
     def load_finalize(self):
         # File Hashes
         self.file_hashes_group.view.setModel(
             table.TableModel(self.hashes, headers=["Type", "Hash"])
+        )
+
+        # Other Hashes
+        self.other_hashes_group.view.setModel(
+            table.TableModel(
+                [
+                    ("Imphash", self.pe_obj.pe.get_imphash()),
+                    ("Authentihash (MD5)", self.pe_obj.lief_obj.authentihash_md5.hex()),
+                    (
+                        "Authentihash (SHA1)",
+                        self.pe_obj.lief_obj.authentihash_sha1.hex(),
+                    ),
+                    (
+                        "Authentihash (SHA256)",
+                        self.pe_obj.lief_obj.authentihash_sha256.hex(),
+                    ),
+                    (
+                        "Authentihash (SHA512)",
+                        self.pe_obj.lief_obj.authentihash_sha512.hex(),
+                    ),
+                ],
+                headers=["Type", "Hash"],
+            )
         )
 
     def enable_tab(self):
