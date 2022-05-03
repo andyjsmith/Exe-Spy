@@ -113,10 +113,6 @@ class ExeSpy(QtWidgets.QMainWindow):
         self.tab_container_layout.setContentsMargins(0, 0, 0, 0)
         tab_container.setLayout(self.tab_container_layout)
         self.tab_container_layout.addWidget(state.tabview)
-        state.tabview.setSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding,
-            QtWidgets.QSizePolicy.MinimumExpanding,
-        )
 
         self.setCentralWidget(main_widget)
 
