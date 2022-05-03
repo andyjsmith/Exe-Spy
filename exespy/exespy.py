@@ -109,10 +109,10 @@ class ExeSpy(QtWidgets.QMainWindow):
 
         # Create a container for the tab view
         tab_container = QtWidgets.QWidget()
-        tab_container_layout = QtWidgets.QVBoxLayout(tab_container)
-        tab_container_layout.setContentsMargins(0, 0, 0, 0)
-        tab_container.setLayout(tab_container_layout)
-        tab_container_layout.addWidget(state.tabview)
+        self.tab_container_layout = QtWidgets.QVBoxLayout(tab_container)
+        self.tab_container_layout.setContentsMargins(0, 0, 0, 0)
+        tab_container.setLayout(self.tab_container_layout)
+        self.tab_container_layout.addWidget(state.tabview)
         state.tabview.setSizePolicy(
             QtWidgets.QSizePolicy.MinimumExpanding,
             QtWidgets.QSizePolicy.MinimumExpanding,
@@ -175,6 +175,9 @@ class ExeSpy(QtWidgets.QMainWindow):
     def load_pe(self, path: str):
         """Load a PE file and begin parsing"""
         try:
+            self.tab_container_layout.removeWidget(state.tabview)
+            state.tabview = tab_view.TabView(self)
+            self.tab_container_layout.addWidget(state.tabview)
             self.progress_bar.show()
             self.progress_bar.setValue(0)
             self.statusBar().showMessage("Loading...")
