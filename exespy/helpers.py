@@ -67,9 +67,10 @@ def show_message_box(
 
 
 def progress_dialog(
-    text: str, title: str = None, parent: QtWidgets.QWidget = None
+    text: str, title: str = "Loading", parent: QtWidgets.QWidget = None
 ) -> QtWidgets.QProgressDialog:
-    progress = QtWidgets.QProgressDialog(text, title, 0, 0, parent)
+    progress = QtWidgets.QProgressDialog(text, "Cancel", 0, 0, parent)
+    progress.setWindowTitle(title)
     progress.setCancelButton(None)
     progress.show()
     QtCore.QCoreApplication.processEvents()
