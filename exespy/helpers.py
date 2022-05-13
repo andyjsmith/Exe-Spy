@@ -59,6 +59,8 @@ def show_message_box(
     msgbox = QtWidgets.QMessageBox()
     if title is None:
         msgbox.setWindowTitle(alert_type[1])
+    else:
+        msgbox.setWindowTitle(title)
     msgbox.setText(text)
     msgbox.setIcon(alert_type[0])
     return msgbox.exec()
