@@ -224,7 +224,7 @@ class HeadersView(QtWidgets.QScrollArea):
                     ("SizeOfHeaders", hex(pe_obj.pe.OPTIONAL_HEADER.SizeOfHeaders)),
                     (
                         "CheckSum",
-                        f"{hex(pe_obj.pe.OPTIONAL_HEADER.CheckSum)} ({pe_obj.verify_checksum()})",
+                        hex(pe_obj.pe.OPTIONAL_HEADER.CheckSum),
                     ),
                     (
                         "Subsystem",
