@@ -28,6 +28,9 @@ class PEFile:
         Initialize the PEFile object
         :param path: Path to the PE file
         """
+
+        logging.getLogger("exespy").info("Loading PE file: " + path)
+
         init_start = time.time()
 
         self.path = path
