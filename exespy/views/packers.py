@@ -1,12 +1,11 @@
 import PySide6.QtWidgets as QtWidgets
-import PySide6.QtGui as QtGui
-import PySide6.QtCore as QtCore
 
 import yara
 
 from .. import pe_file
-from .components import table
 from .. import state
+from .. import helpers
+from .components import table
 
 
 class PackersView(QtWidgets.QWidget):
@@ -50,7 +49,7 @@ class PackersView(QtWidgets.QWidget):
         #
         # rules.save("exespy/yara/compiled.yara.bin")
 
-        rules = yara.load("exespy/yara/compiled.yara.bin")
+        rules = yara.load(helpers.resource_path("yara/compiled.yara.bin"))
 
         matches = rules.match(data=pe_obj.data)
 
