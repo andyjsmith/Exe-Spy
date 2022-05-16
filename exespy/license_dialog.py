@@ -1,3 +1,5 @@
+import logging
+
 import PySide6.QtCore as QtCore
 import PySide6.QtWidgets as QtWidgets
 
@@ -17,7 +19,7 @@ class LicenseDialog(QtWidgets.QDialog):
         text.setReadOnly(True)
         text_file = QtCore.QFile(helpers.resource_path("third_party_licenses.txt"))
         if not text_file.open(QtCore.QIODevice.ReadOnly):
-            print(text_file.errorString())
+            logging.getLogger("exespy").error(text_file.errorString())
 
         stream = QtCore.QTextStream(text_file)
         text.setPlainText(stream.readAll())

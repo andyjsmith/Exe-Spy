@@ -1,6 +1,7 @@
-import enum
 import time
+import logging
 from typing import Dict
+
 import PySide6.QtCore as QtCore
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtGui as QtGui
@@ -36,7 +37,12 @@ class LoadWorker(QtCore.QObject):
         self.pe = pe
 
     def run(self):
+        load_start = time.time()
         self.tab.load_async(self.pe)
+        load_end = time.time()
+        logging.getLogger("exespy").debug(
+            f"{self.tab.NAME} (ASYNC) took {load_end - load_start:.4f} seconds"
+        )
         self.finished.emit()
 
 
@@ -117,9 +123,10 @@ class TabView(QtWidgets.QTabWidget):
                 self.set_loading(tab_name, True)
 
         # Load tabs (sync and async)
+        total_load_start = time.time()
         i = 0
         for tab_name, tab in self.tabs.items():
-            start = time.time()
+            load_start = time.time()
             if hasattr(tab, "load"):
                 if hasattr(tab, "LOAD_ASYNC") and tab.LOAD_ASYNC:
                     # Asynchronous load
@@ -137,12 +144,19 @@ class TabView(QtWidgets.QTabWidget):
                     # Synchronous load
                     tab.load(pe)
                     self.set_disabled(tab_name, False)
-            end = time.time()
-            print(f"{tab_name} took {end - start} seconds to load")
+
+            logging.getLogger("exespy").debug(
+                f"{tab_name} took {time.time() - load_start:.4f} seconds"
+            )
+
             i += 1
             self.window().progress_bar.setValue(i)
             self.window().statusBar().repaint()
             QtCore.QCoreApplication.processEvents()
+
+        logging.getLogger("exespy").debug(
+            f"Total synchronous load took {time.time() - total_load_start:.4f} seconds"
+        )
 
         self.window().progress_bar.hide()
         self.window().statusBar().clearMessage()

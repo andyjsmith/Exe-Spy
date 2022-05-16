@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import hashlib
 import os
 import time
+import logging
 
 import pefile
 import lief
@@ -34,7 +35,9 @@ class PEFile:
         # TODO: this is a very slow operation, any way to speed up checksum generation?
         start = time.time()
         self.calculated_checksum = self.pe.generate_checksum()
-        print(f"Generated checksum in {time.time() - start} seconds")
+        logging.getLogger("exespy").debug(
+            f"Generated checksum in {time.time() - start} seconds"
+        )
 
         self.sha256 = self.calculate_sha256()
 

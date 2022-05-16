@@ -1,5 +1,6 @@
-import os
 import sys
+import argparse
+import logging
 
 import PySide6.QtGui as QtGui
 import PySide6.QtWidgets as QtWidgets
@@ -196,16 +197,40 @@ class ExeSpy(QtWidgets.QMainWindow):
 
 def main():
     """Main entry point"""
+
+    # Set up logging
+    logging.basicConfig(
+        force=True,
+        format="[%(levelname)s] %(message)s",
+    )
+
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description="A GUI tool for analyzing PE files")
+    parser.add_argument("file", help="Open the specified PE file", type=str, nargs="?")
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version=f"{helpers.APP_NAME} {'.'.join((str(v) for v in helpers.VERSION))} by {helpers.ORGANIZATION_NAME}",
+        help="display version information",
+    )
+    parser.add_argument("--debug", help="show debug output", action="store_true")
+    args = parser.parse_args()
+
+    if args.debug:
+        # Enable verbose logging
+        logging.getLogger("exespy").setLevel(logging.DEBUG)
+        logging.getLogger("exespy").debug("DEBUG mode enabled")
+
     app = QtWidgets.QApplication(sys.argv)
     # app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
 
     app.setOrganizationName(helpers.ORGANIZATION_NAME)
     app.setOrganizationDomain(helpers.ORGANIZATION_DOMAIN)
     app.setApplicationName(helpers.APP_NAME)
+    app.setWindowIcon(QtGui.QIcon(helpers.resource_path("img/icon.ico")))
 
     exe_spy = ExeSpy()
-
-    app.setWindowIcon(QtGui.QIcon(helpers.resource_path("img/icon.ico")))
 
     exe_spy.show()
 
@@ -215,12 +240,12 @@ def main():
 
         pyi_splash.close()
     except ImportError:
+        logging.debug("pyi_splash not found")
         pass
 
     # Process command-line file(s)
-    if len(sys.argv) > 1:
-        for filename in sys.argv[1:]:
-            exe_spy.load_pe(filename)
+    if args.file is not None:
+        exe_spy.load_pe(args.file)
 
     sys.exit(app.exec())
 
