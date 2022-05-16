@@ -1,4 +1,5 @@
 import sys
+import os
 import argparse
 import logging
 
@@ -133,13 +134,21 @@ class ExeSpy(QtWidgets.QMainWindow):
 
     def show_open_file(self):
         """Show the open file dialog"""
-        file_selection = QtWidgets.QFileDialog.getOpenFileName(self, "Open PE File")
+        file_selection = QtWidgets.QFileDialog.getOpenFileName(
+            self,
+            "Open PE File",
+            self.settings.value("file/last_open_dir", "", str),
+            "PE Files (*.exe *.dll *.com *.ocx *.sys *.scr *.cpl *.ax *.acm *.winmd *.mui *.mun *.efi *.tsp *.drv);;All files (*.*)",
+        )
 
         if (
             isinstance(file_selection, tuple)
             and len(file_selection) > 0
             and len(file_selection[0]) > 0
         ):
+            self.settings.setValue(
+                "file/last_open_dir", os.path.dirname(file_selection[0])
+            )
             self.load_pe(file_selection[0])
 
         self.statusBar().clearMessage()
