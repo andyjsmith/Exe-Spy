@@ -11,7 +11,7 @@
 			"program": "run.py",
 			"console": "integratedTerminal",
 			"cwd": "${workspaceFolder}",
-			"args": ["C:\\Users\\Andy\\Downloads\\notepad.exe"]
+			"args": ["C:\\Users\\Andy\\Downloads\\notepad.exe", "--debug"]
 		}
 	]
 }
