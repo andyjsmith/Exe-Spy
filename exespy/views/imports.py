@@ -4,23 +4,21 @@ from .. import pe_file
 from .components import table
 
 
-class ImportsView(QtWidgets.QScrollArea):
+class ImportsView(QtWidgets.QWidget):
     NAME = "Imports"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Set up scroll area
-        self.setWidgetResizable(True)
-        self.scroll_area = QtWidgets.QWidget(self)
-        self.setWidget(self.scroll_area)
-        self.scroll_area.setLayout(QtWidgets.QFormLayout())
+        self.setLayout(QtWidgets.QVBoxLayout())
 
         # Imports
-        self.imports_group = table.TableGroup(
-            "Imports", fit_columns=True, headers=["Name", "Library", "Address"]
+        self.imports_table = table.TableView(
+            fit_columns=True,
+            fit_to_contents=False,
+            headers=["Name", "Library", "Address"],
         )
-        self.scroll_area.layout().addWidget(self.imports_group)
+        self.layout().addWidget(self.imports_table)
 
     def load(self, pe_obj: pe_file.PEFile):
         # Imports
@@ -44,6 +42,6 @@ class ImportsView(QtWidgets.QScrollArea):
 
         # TODO: Add support for delay imports DIRECTORY_ENTRY_DELAY_IMPORT
 
-        self.imports_group.view.setModel(
+        self.imports_table.setModel(
             table.TableModel(imports_list, headers=["Name", "Library", "Address"])
         )

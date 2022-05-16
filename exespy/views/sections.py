@@ -16,6 +16,7 @@ class SectionsView(QtWidgets.QWidget):
         self.sections_table = table.TableView(
             fit_columns=True,
             fit_to_contents=False,
+            expand_last_column=True,
             headers=[
                 "Name",
                 "VirtualSize",

@@ -4,23 +4,21 @@ from .. import pe_file
 from .components import table
 
 
-class ExportsView(QtWidgets.QScrollArea):
+class ExportsView(QtWidgets.QWidget):
     NAME = "Exports"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Set up scroll area
-        self.setWidgetResizable(True)
-        self.scroll_area = QtWidgets.QWidget(self)
-        self.setWidget(self.scroll_area)
-        self.scroll_area.setLayout(QtWidgets.QFormLayout())
+        self.setLayout(QtWidgets.QVBoxLayout())
 
         # Exports
-        self.exports_group = table.TableGroup(
-            "Exports", fit_columns=True, headers=["Name", "Ordinal", "Address"]
+        self.exports_table = table.TableView(
+            fit_columns=True,
+            fit_to_contents=False,
+            headers=["Name", "Ordinal", "Address"],
         )
-        self.scroll_area.layout().addWidget(self.exports_group)
+        self.layout().addWidget(self.exports_table)
 
     def load(self, pe_obj: pe_file.PEFile):
         # Exports
@@ -35,6 +33,6 @@ class ExportsView(QtWidgets.QScrollArea):
 
                 exports_list.append((name, symbol.ordinal, hex(symbol.address)))
 
-        self.exports_group.view.setModel(
+        self.exports_table.setModel(
             table.TableModel(exports_list, headers=["Name", "Ordinal", "Address"])
         )

@@ -28,7 +28,9 @@ class ResourcesView(QtWidgets.QWidget):
             "Magic",
         ]
         self.resources_table = table.TableView(
+            fit_columns=True,
             fit_to_contents=False,
+            expand_last_column=True,
             headers=self.HEADERS,
         )
 

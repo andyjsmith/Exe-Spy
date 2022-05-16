@@ -4,23 +4,19 @@ from .. import pe_file
 from .components import table
 
 
-class LibrariesView(QtWidgets.QScrollArea):
+class LibrariesView(QtWidgets.QWidget):
     NAME = "Libraries"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Set up scroll area
-        self.setWidgetResizable(True)
-        self.scroll_area = QtWidgets.QWidget(self)
-        self.setWidget(self.scroll_area)
-        self.scroll_area.setLayout(QtWidgets.QFormLayout())
+        self.setLayout(QtWidgets.QVBoxLayout())
 
         # Libraries
-        self.libraries_group = table.TableGroup(
-            "Libraries", fit_columns=True, headers=["Name", "Imports"]
+        self.libraries_table = table.TableView(
+            fit_columns=True, fit_to_contents=False, headers=["Name", "Imports"]
         )
-        self.scroll_area.layout().addWidget(self.libraries_group)
+        self.layout().addWidget(self.libraries_table)
 
     def load(self, pe_obj: pe_file.PEFile):
         # Libraries
@@ -34,6 +30,6 @@ class LibrariesView(QtWidgets.QScrollArea):
                     )
                 )
 
-        self.libraries_group.view.setModel(
+        self.libraries_table.setModel(
             table.TableModel(libraries_list, headers=["Name", "Imports"])
         )

@@ -92,7 +92,7 @@ class TableView(QtWidgets.QTableView):
 
         self.headers = headers
         self.fit_columns = fit_columns
-        self.fit_to_contents = fit_to_contents
+        self.fit_to_contents = fit_to_contents  # Scales table to fit contents, don't use for central widget
         self.first_column_scale = first_column_scale
         self.expand_last_column = expand_last_column
 
@@ -144,5 +144,4 @@ class TableView(QtWidgets.QTableView):
 
     def setModel(self, *args, **kwargs):
         super().setModel(*args, **kwargs)
-        if self.fit_to_contents:
-            self.fit_contents()
+        self.fit_contents()
