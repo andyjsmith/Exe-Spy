@@ -25,13 +25,14 @@ class LibrariesView(QtWidgets.QScrollArea):
     def load(self, pe_obj: pe_file.PEFile):
         # Libraries
         libraries_list = []
-        for import_obj in pe_obj.pe.DIRECTORY_ENTRY_IMPORT:
-            libraries_list.append(
-                (
-                    import_obj.dll.decode("utf-8").strip("\x00"),
-                    len(import_obj.imports),
+        if hasattr(pe_obj.pe, "DIRECTORY_ENTRY_IMPORT"):
+            for import_obj in pe_obj.pe.DIRECTORY_ENTRY_IMPORT:
+                libraries_list.append(
+                    (
+                        import_obj.dll.decode("utf-8").strip("\x00"),
+                        len(import_obj.imports),
+                    )
                 )
-            )
 
         self.libraries_group.view.setModel(
             table.TableModel(libraries_list, headers=["Name", "Imports"])
