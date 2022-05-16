@@ -1,4 +1,5 @@
 import math
+import io
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtCore as QtCore
 import PySide6.QtGui as QtGui
@@ -115,7 +116,7 @@ class HexView(QtWidgets.QWidget):
         self.hex_values = []
         self.text_values = []
 
-        with open(pe_obj.path, "rb") as f:
+        with io.BytesIO(pe_obj.data) as f:
             data = f.read(BYTES_PER_LINE)
             while data:
                 self.address_values.append(

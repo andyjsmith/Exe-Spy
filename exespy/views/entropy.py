@@ -1,4 +1,5 @@
 import math
+import io
 from collections import Counter
 
 import PySide6.QtWidgets as QtWidgets
@@ -90,7 +91,7 @@ class EntropyView(QtWidgets.QWidget):
             self.line_plot_tab.layout().removeWidget(self.line_plot_canvas)
 
         # Calculate entropy from file
-        with open(pe_obj.path, "rb") as f:
+        with io.BytesIO(pe_obj.data) as f:
             data = f.read(self.block_size)
             while data:
                 self.entropy.append(self.calc_entropy(data))

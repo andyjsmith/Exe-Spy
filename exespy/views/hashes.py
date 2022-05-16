@@ -1,5 +1,6 @@
 import hashlib
 import zlib
+import io
 
 import PySide6.QtWidgets as QtWidgets
 
@@ -49,7 +50,7 @@ class HashesView(QtWidgets.QScrollArea):
 
     def load_async(self, pe_obj: pe_file.PEFile):
         self.pe_obj = pe_obj
-        self.hashes = self.calculate_hashes(pe_obj.path, pe_obj)
+        self.hashes = self.calculate_hashes(pe_obj)
 
     def load_finalize(self):
         # File Hashes
@@ -87,7 +88,7 @@ class HashesView(QtWidgets.QScrollArea):
         self.load_async(pe_obj)
         self.load_finalize()
 
-    def calculate_hashes(self, filename, pe_obj: pe_file.PEFile) -> "list[tuple]":
+    def calculate_hashes(self, pe_obj: pe_file.PEFile) -> "list[tuple]":
         """Calculate file hashes as a list of tuples."""
         hash_crc32 = crc32()
         hash_md5 = hashlib.md5()
@@ -104,7 +105,7 @@ class HashesView(QtWidgets.QScrollArea):
         hash_blake2b = hashlib.blake2b()
 
         # Calculate the hashes while only looping through the file once
-        with open(filename, "rb") as f:
+        with io.BytesIO(pe_obj.data) as f:
             # Read the file in chunks of 4096 bytes
             for byte_block in iter(lambda: f.read(4096), b""):
                 hash_crc32.update(byte_block)

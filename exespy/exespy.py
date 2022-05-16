@@ -35,8 +35,8 @@ class ExeSpy(QtWidgets.QMainWindow):
         self.app = QtWidgets.QApplication.instance()
         self.settings = QtCore.QSettings()
 
+        # Switch to the appropriate style
         self.initial_style = self.app.style().name()
-
         use_native_style = self.settings.value("view/native_style", False, bool)
 
         if not use_native_style:
@@ -104,6 +104,7 @@ class ExeSpy(QtWidgets.QMainWindow):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_widget.setLayout(main_layout)
 
+        # Style the status bar
         self.statusBar().setStyleSheet(
             "QStatusBar QLabel { border-color: lightgray; border-style: solid; border-width: 0 1px 0 0; }"
         )
@@ -225,16 +226,17 @@ def main():
     app = QtWidgets.QApplication(sys.argv)
     # app.setAttribute(QtCore.Qt.AA_EnableHighDpiScaling)
 
+    # Configure application info/metadata
     app.setOrganizationName(helpers.ORGANIZATION_NAME)
     app.setOrganizationDomain(helpers.ORGANIZATION_DOMAIN)
     app.setApplicationName(helpers.APP_NAME)
     app.setWindowIcon(QtGui.QIcon(helpers.resource_path("img/icon.ico")))
 
+    # Create and show the main application
     exe_spy = ExeSpy()
-
     exe_spy.show()
 
-    # Close the splash screen
+    # Close the PyInstaller splash screen if applicable
     try:
         import pyi_splash  # type: ignore
 
@@ -243,10 +245,11 @@ def main():
         logging.debug("pyi_splash not found")
         pass
 
-    # Process command-line file(s)
+    # Process command-line file
     if args.file is not None:
         exe_spy.load_pe(args.file)
 
+    # Run the app
     sys.exit(app.exec())
 
 

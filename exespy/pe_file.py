@@ -3,6 +3,7 @@ import hashlib
 import os
 import time
 import logging
+import io
 
 import pefile
 import lief
@@ -27,21 +28,33 @@ class PEFile:
         Initialize the PEFile object
         :param path: Path to the PE file
         """
+        init_start = time.time()
+
         self.path = path
         self.name = os.path.basename(path)
         self.stat = os.stat(path)
-        self.pe = pefile.PE(path)
-        self.lief_obj = lief.parse(path)
+
+        # Read the PE into memory so it can be reused
+        with open(path, "rb") as f:
+            self.data = f.read()
+
+        self.pe = pefile.PE(data=self.data)
+        self.lief_obj = lief.parse(raw=self.data, name=self.name)
+
         # TODO: this is a very slow operation, any way to speed up checksum generation?
-        start = time.time()
+        checksum_start = time.time()
         self.calculated_checksum = self.pe.generate_checksum()
         logging.getLogger("exespy").debug(
-            f"Generated checksum in {time.time() - start} seconds"
+            f"Generated checksum in {time.time() - checksum_start:.4f} seconds"
         )
 
         self.sha256 = self.calculate_sha256()
 
         self.resources = self.get_resources()
+
+        logging.getLogger("exespy").debug(
+            f"PEFile init finished in {time.time() - init_start:.4f} seconds"
+        )
 
     def type(self) -> str:
         """Return the type of the PE file (PE/DLL/etc)"""
@@ -211,11 +224,10 @@ class PEFile:
 
         return resources
 
-    # TODO: this is slow, maybe do in another thread?
     def strings(self, min_length=10) -> "list[str]":
         """Return a list of strings from the PE file"""
         strings = []
-        with open(self.path, "rb") as f:
+        with io.BytesIO(self.data) as f:
             current_string = b""
             byte = f.read(1)
 
@@ -244,7 +256,7 @@ class PEFile:
         """Generate a SHA256 hash of the PE file"""
         sha256 = hashlib.sha256()
         # Calculate the hashes while only looping through the file once
-        with open(self.path, "rb") as f:
+        with io.BytesIO(self.data) as f:
             # Read the file in chunks of 4096 bytes
             for byte_block in iter(lambda: f.read(4096), b""):
                 sha256.update(byte_block)

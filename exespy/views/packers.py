@@ -52,7 +52,7 @@ class PackersView(QtWidgets.QWidget):
 
         rules = yara.load("exespy/yara/compiled.yara.bin")
 
-        matches = rules.match(pe_obj.path)
+        matches = rules.match(data=pe_obj.data)
 
         for match in matches:
             if "description" in match.meta:
