@@ -44,7 +44,7 @@ class EntropyView(QtWidgets.QWidget):
             ["8", "16", "32", "64", "128", "256", "512", "1024", "2048", "4096"]
         )
 
-        self.block_size = 64
+        self.block_size = 128
         self.block_size_box.setCurrentText(str(self.block_size))
 
         self.block_size_box.currentTextChanged.connect(self.handle_block_size_changed)
