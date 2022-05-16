@@ -5,7 +5,6 @@ import PySide6.QtCore as QtCore
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtGui as QtGui
 
-import humanize
 import icoextract
 
 from .. import helpers
@@ -116,7 +115,7 @@ class GeneralView(QtWidgets.QScrollArea):
         self.model = [
             (
                 "Size",
-                f"{humanize.naturalsize(pe_obj.stat.st_size, binary=True)} ({humanize.intcomma(pe_obj.stat.st_size)} bytes)",
+                f"{self.sizeof_fmt(pe_obj.stat.st_size)} ({pe_obj.stat.st_size:,} bytes)",
             ),
             (
                 "Timestamp",
@@ -139,3 +138,10 @@ class GeneralView(QtWidgets.QScrollArea):
             table.TableModel(self.model + [("Checksum", self.pe_obj.verify_checksum())])
         )
         QtCore.QCoreApplication.processEvents()
+
+    def sizeof_fmt(self, num, suffix="B"):
+        for unit in ["", "Ki", "Mi", "Gi", "Ti", "Pi", "Ei", "Zi"]:
+            if abs(num) < 1024.0:
+                return f"{num:3.1f}{unit}{suffix}"
+            num /= 1024.0
+        return f"{num:.1f}Yi{suffix}"
