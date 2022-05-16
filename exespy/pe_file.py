@@ -41,12 +41,7 @@ class PEFile:
         self.pe = pefile.PE(data=self.data)
         self.lief_obj = lief.parse(raw=self.data, name=self.name)
 
-        # TODO: this is a very slow operation, any way to speed up checksum generation?
-        checksum_start = time.time()
-        self.calculated_checksum = self.pe.generate_checksum()
-        logging.getLogger("exespy").debug(
-            f"Generated checksum in {time.time() - checksum_start:.4f} seconds"
-        )
+        self.__calculated_checksum = None
 
         self.sha256 = self.calculate_sha256()
 
@@ -55,6 +50,15 @@ class PEFile:
         logging.getLogger("exespy").debug(
             f"PEFile init finished in {time.time() - init_start:.4f} seconds"
         )
+
+    def calculate_checksum(self) -> int:
+        """Calculate the PE file's internal checksum"""
+
+        # Cache the result so we don't waste time recalculating it
+        if self.__calculated_checksum is None:
+            self.__calculated_checksum = self.pe.generate_checksum()
+
+        return self.__calculated_checksum
 
     def type(self) -> str:
         """Return the type of the PE file (PE/DLL/etc)"""
@@ -116,10 +120,11 @@ class PEFile:
 
     def verify_checksum(self) -> str:
         """Verify the PE file's checksum"""
-        if self.pe.OPTIONAL_HEADER.CheckSum == self.calculated_checksum:
+        calculated_checksum = self.calculate_checksum()
+        if self.pe.OPTIONAL_HEADER.CheckSum == calculated_checksum:
             return "Valid"
         else:
-            return f"Invalid, should be {hex(self.calculated_checksum)}"
+            return f"Invalid, should be {hex(calculated_checksum)}"
 
     def characteristics(self) -> "list[str]":
         """Return a list of characteristics for the PE file"""

@@ -1,3 +1,6 @@
+import time
+import logging
+
 import PySide6.QtCore as QtCore
 import PySide6.QtWidgets as QtWidgets
 import PySide6.QtGui as QtGui
@@ -5,10 +8,27 @@ import PySide6.QtGui as QtGui
 import humanize
 import icoextract
 
-from . import view
 from .. import helpers
 from .. import pe_file
 from .components import table
+
+
+class ChecksumWorker(QtCore.QObject):
+    """Calculate the checksum of the PE file asynchronously since it is slow"""
+
+    finished = QtCore.Signal()
+
+    def __init__(self, pe: pe_file.PEFile):
+        super().__init__()
+        self.pe = pe
+
+    def run(self):
+        start = time.time()
+        self.pe.calculate_checksum()
+        logging.getLogger("exespy").debug(
+            f" (ASYNC) took {time.time() - start:.4f} seconds"
+        )
+        self.finished.emit()
 
 
 class GeneralView(QtWidgets.QScrollArea):
@@ -49,6 +69,18 @@ class GeneralView(QtWidgets.QScrollArea):
         self.scroll_area.layout().addWidget(self.image_group)
 
     def load(self, pe_obj: pe_file.PEFile):
+        self.pe_obj = pe_obj
+
+        self.thread = QtCore.QThread()
+        self.worker = ChecksumWorker(pe_obj)
+        self.worker.moveToThread(self.thread)
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+        self.thread.start()
+        self.thread.finished.connect(self.show_checksum_result)
+
         self.file_name.setText(pe_obj.name)
 
         try:
@@ -81,24 +113,31 @@ class GeneralView(QtWidgets.QScrollArea):
         )
 
         # Image Information
+        self.model = [
+            (
+                "Size",
+                f"{humanize.naturalsize(pe_obj.stat.st_size, binary=True)} ({humanize.intcomma(pe_obj.stat.st_size)} bytes)",
+            ),
+            (
+                "Timestamp",
+                helpers.format_time(pe_obj.pe.FILE_HEADER.TimeDateStamp),
+            ),
+            ("Type", pe_obj.type()),
+            ("Architecture", pe_obj.architecture()),
+            ("Subsystem", pe_obj.subsystem()),
+            ("Image Base", hex(pe_obj.pe.OPTIONAL_HEADER.ImageBase)),
+            ("Entrypoint", hex(pe_obj.pe.OPTIONAL_HEADER.AddressOfEntryPoint)),
+            ("Signature", pe_obj.verify_signature()),
+        ]
         self.image_group.view.setModel(
-            table.TableModel(
-                [
-                    (
-                        "Size",
-                        f"{humanize.naturalsize(pe_obj.stat.st_size, binary=True)} ({humanize.intcomma(pe_obj.stat.st_size)} bytes)",
-                    ),
-                    (
-                        "Timestamp",
-                        helpers.format_time(pe_obj.pe.FILE_HEADER.TimeDateStamp),
-                    ),
-                    ("Type", pe_obj.type()),
-                    ("Architecture", pe_obj.architecture()),
-                    ("Subsystem", pe_obj.subsystem()),
-                    ("Image Base", hex(pe_obj.pe.OPTIONAL_HEADER.ImageBase)),
-                    ("Entrypoint", hex(pe_obj.pe.OPTIONAL_HEADER.AddressOfEntryPoint)),
-                    ("Signature", pe_obj.verify_signature()),
-                    ("Checksum", pe_obj.verify_checksum()),
-                ]
-            )
+            table.TableModel(self.model + [("Checksum", "loading...")])
         )
+
+    def show_checksum_result(self):
+        """Add the checksum verification result to the table."""
+        self.image_group.view.setModel(
+            table.TableModel(self.model + [("Checksum", self.pe_obj.verify_checksum())])
+        )
+        QtCore.QCoreApplication.processEvents()
+
+        print("RESULT")
