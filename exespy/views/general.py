@@ -139,5 +139,3 @@ class GeneralView(QtWidgets.QScrollArea):
             table.TableModel(self.model + [("Checksum", self.pe_obj.verify_checksum())])
         )
         QtCore.QCoreApplication.processEvents()
-
-        print("RESULT")
