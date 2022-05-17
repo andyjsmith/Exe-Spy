@@ -1,2 +1,2 @@
 include *.py
-recursive-include exespy *.py *.png *.txt *.ico
+recursive-include exespy *.py *.png *.txt *.ico *.yara

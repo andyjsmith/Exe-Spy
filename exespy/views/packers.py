@@ -39,17 +39,16 @@ class PackersView(QtWidgets.QWidget):
         # Packers
         self.matches_list = []
 
-        # rules = yara.compile(
-        #     filepaths={
-        #         "Yara's Packers List": "yara/packer.yara",
-        #         "PEID Rules": "yara/peid.yara",
-        #         "GoDaddy's Packer List": "yara/godaddy.yara",
-        #     }
-        # )
-        #
-        # rules.save("exespy/yara/compiled.yara.bin")
+        rules = yara.compile(
+            filepaths={
+                "Yara's Packers List": helpers.resource_path("yara/packer.yara"),
+                "PEID Rules": helpers.resource_path("yara/peid.yara"),
+                "GoDaddy's Packer List": helpers.resource_path("yara/godaddy.yara"),
+            }
+        )
 
-        rules = yara.load(helpers.resource_path("yara/compiled.yara.bin"))
+        # rules.save("exespy/yara/compiled.yara.bin")
+        # rules = yara.load(helpers.resource_path("yara/compiled.yara.bin"))
 
         matches = rules.match(data=pe_obj.data)
 

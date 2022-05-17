@@ -7,7 +7,7 @@ data = [
     ("exespy/img/*.png", "img"),
     ("exespy/img/*.ico", "img"),
     ("exespy/third_party_licenses.txt", "."),
-    ("exespy/yara/compiled.yara.bin", "yara"),
+    ("exespy/yara/*.yara", "yara"),
 ]
 
 a = Analysis(
