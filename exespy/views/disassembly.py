@@ -19,6 +19,7 @@ class DisassemblyView(QtWidgets.QWidget):
         super().__init__(*args, **kwargs)
 
         self.loaded = False
+        self.assembly_text = ""
 
         self.pe_obj: pe_file.PEFile = None
         self.assembly: "list[str]" = None
@@ -71,6 +72,10 @@ class DisassemblyView(QtWidgets.QWidget):
         self.pe_obj = pe_obj
 
         if pe_obj is None:
+            return
+
+        if not pe_obj.is_x86():
+            self.assembly_text = "This file is not an x86 executable."
             return
 
         if self.formatter_syntax_box.currentText() == "Intel":
