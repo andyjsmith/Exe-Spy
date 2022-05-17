@@ -137,7 +137,6 @@ class HashesView(QtWidgets.QScrollArea):
             ("SHA3-512", hash_sha3_512.hexdigest()),
             ("BLAKE2s", hash_blake2s.hexdigest()),
             ("BLAKE2b", hash_blake2b.hexdigest()),
-            ("Imphash", pe_obj.pe.get_imphash()),
         ]
 
 
