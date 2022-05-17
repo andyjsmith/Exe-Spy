@@ -28,6 +28,7 @@ Additional functionality includes:
 ## Requirements
 
 - Python 3.8+
+- Windows, macOS, or Linux (Windows 10 or higher if not using pre-built binaries)
 
 ## Installation
 
