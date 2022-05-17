@@ -193,7 +193,10 @@ class PEFile:
                 if type_item.name is not None:
                     resource_type = str(type_item.name)
                 else:
-                    resource_type = pefile.RESOURCE_TYPE[type_item.id]
+                    if type_item.id in pefile.RESOURCE_TYPE:
+                        resource_type = pefile.RESOURCE_TYPE[type_item.id]
+                    else:
+                        resource_type = f"Unknown (0x{type_item.id:x})"
 
                 if hasattr(type_item, "directory") and hasattr(
                     type_item.directory, "entries"
@@ -208,10 +211,17 @@ class PEFile:
                             id_item.directory, "entries"
                         ):
                             for language_item in id_item.directory.entries:
-                                lang = pefile.LANG[language_item.data.lang]
-                                sublang = pefile.get_sublang_name_for_lang(
-                                    language_item.data.lang, language_item.data.sublang
-                                )
+                                if language_item.data.lang in pefile.LANG:
+                                    lang = pefile.LANG[language_item.data.lang]
+                                    sublang = pefile.get_sublang_name_for_lang(
+                                        language_item.data.lang,
+                                        language_item.data.sublang,
+                                    )
+                                else:
+                                    lang = f"Unknown (0x{language_item.data.lang:x})"
+                                    sublang = (
+                                        f"Unknown (0x{language_item.data.sublang:x})"
+                                    )
 
                                 resource_obj = Resource(
                                     resource_type,
