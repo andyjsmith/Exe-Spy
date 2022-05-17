@@ -4,7 +4,7 @@ lief
 icoextract
 yara-python
 iced-x86
-python-magic-bin; sys_platform == "win32"
-python-magic; sys_platform != "win32"
+python-magic-bin; platform_system == "Windows"
+python-magic; platform_system != "Windows"
 vt-py
 matplotlib
