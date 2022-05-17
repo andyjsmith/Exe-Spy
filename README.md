@@ -132,7 +132,7 @@ The Characteristics and DLLCharacteristics rows show the characteristics that we
 
 ### Sections
 
-The sections tab shows the sections inside the PE file and all of their properties. This includes deprecated section header variables like PointerToLinenumbers for thoroughness. The characteristics columns shows the section characteristics. In particular is MEM_EXECUTE, which means that the section is executable.
+The sections tab shows the sections inside the PE file and all of their properties. This includes deprecated section header variables like PointerToLinenumbers for thoroughness. The characteristics column shows the section characteristics. In particular is MEM_EXECUTE, which means that the section is executable.
 
 ### Libraries
 
@@ -174,7 +174,7 @@ To configure how many ASCII characters are needed in a row before it is consider
 
 The hex view tab is a basic hex viewer for the PE file. The columns are the offset from the start of the file, the hex values, and an ASCII decoding of the hex values.
 
-Since Python and Qt together are fairly slow together, this tab may take a while to load.
+Since Python and Qt are fairly slow together, this tab may take a while to load.
 
 ### Hashes
 
@@ -204,7 +204,7 @@ The Go to Entrypoint button jumps to the entrypoint of the PE file. This is usef
 
 You can jump to a specific address by entering it into the textbox. It intelligently determines whether you entered an address with or without the image base included, so you can either include the image base or not.
 
-You can also specify with assembly syntax you want the disassembly to use. By default, it uses Intel syntax.
+You can also specify which assembly syntax you want the disassembly to use. By default, it uses Intel syntax.
 
 ### Packers
 
