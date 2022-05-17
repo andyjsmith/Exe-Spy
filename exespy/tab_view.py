@@ -108,6 +108,8 @@ class TabView(QtWidgets.QTabWidget):
         self.add_tab(entropy.EntropyView())
         self.add_tab(virustotal.VirusTotalView())
 
+        self.ORIGINAL_TAB_TEXT_COLOR = self.tabBar().tabTextColor(0)
+
         # Disable all tabs except general
         for tab_name, tab in self.tabs.items():
             if tab_name != general.GeneralView.NAME:
@@ -184,7 +186,7 @@ class TabView(QtWidgets.QTabWidget):
             self.tabBar().setTabEnabled(self.indexOf(self.tabs[tab]), False)
         else:
             self.tabBar().setTabTextColor(
-                self.indexOf(self.tabs[tab]), QtGui.QColor(0, 0, 0)
+                self.indexOf(self.tabs[tab]), self.ORIGINAL_TAB_TEXT_COLOR
             )
             self.tabBar().setTabEnabled(self.indexOf(self.tabs[tab]), True)
 
