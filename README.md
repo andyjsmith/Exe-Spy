@@ -74,7 +74,7 @@ See the [documentation](#documentation) for more information.
 
 ![Strings](screenshots/strings.png)
 
-## Hex Viewer
+### Hex Viewer
 
 ![Hex Viewer](screenshots/hexview.png)
 
