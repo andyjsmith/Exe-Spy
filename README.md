@@ -28,7 +28,9 @@ Additional functionality includes:
 ## Requirements
 
 - Python 3.8+
-- Windows, macOS, or Linux (Windows 10 or higher if not using pre-built binaries)
+- Windows 10 1809+, macOS, or Linux
+  - See [https://doc.qt.io/qt-6/supported-platforms.html](https://doc.qt.io/qt-6/supported-platforms.html)
+  - Older Linux versions than what are listed at the link above may work correctly
 
 ## Installation
 
@@ -248,7 +250,7 @@ To use this tab, you need to get a free VirusTotal API key. Register for an acco
 
 ExeSpy
 
-Copyright (C) 2022 Andy Smith
+Copyright (C) 2023 Andy Smith
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
