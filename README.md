@@ -1,5 +1,8 @@
 ![ExeSpy](exespy/img/wordmark.png)
 
+![](https://img.shields.io/github/v/release/andyjsmith/Exe-Spy)
+![](https://img.shields.io/github/downloads/andyjsmith/Exe-Spy/total)
+
 # ExeSpy: Cross-Platform PE File Viewer (EXE/DLL)
 
 ExeSpy is a free, open-source cross-platform Windows PE file viewer. It supports all valid PE formats, including EXE, DLL, COM, OCX, SYS, SCR, CPL, AX, ACM, WINMD, MUI, EFI, TSP, and DRV.
