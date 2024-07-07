@@ -42,7 +42,7 @@ class PEFile:
             self.data = f.read()
 
         self.pe = pefile.PE(data=self.data)
-        self.lief_obj = lief.parse(raw=self.data, name=self.name)
+        self.lief_obj = lief.parse(raw=self.data)
 
         self.__calculated_checksum = None
 
