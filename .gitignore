@@ -132,3 +132,5 @@ cython_debug/
 
 sample_hives/
 qdarkstyle/
+
+.python-version

@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define AppName "ExeSpy"
-#define AppVersion "1.0.0"
+#define AppVersion "1.0.1"
 #define AppPublisher "Andy Smith"
-#define AppURL "https://ajsmith.us/projects/exespy/"
+#define AppURL "https://ajsmith.org/projects/exespy/"
 #define AppExeName "exespy.exe"
 
 [Setup]

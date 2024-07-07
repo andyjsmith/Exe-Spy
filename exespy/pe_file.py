@@ -1,12 +1,12 @@
-from dataclasses import dataclass
 import hashlib
+import io
+import logging
 import os
 import time
-import logging
-import io
+from dataclasses import dataclass
 
-import pefile
 import lief
+import pefile
 
 
 @dataclass

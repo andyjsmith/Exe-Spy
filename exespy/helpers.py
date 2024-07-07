@@ -9,13 +9,13 @@ import PySide6.QtCore as QtCore
 
 APP_NAME = "Exe Spy"
 APP_NAME_SHORT = "exespy"
-VERSION = (1, 0, 0)
+VERSION = (1, 0, 1)
 ORGANIZATION_NAME = "Andy Smith"
-ORGANIZATION_DOMAIN = "ajsmith.us"
+ORGANIZATION_DOMAIN = "ajsmith.org"
 ABOUT_TEXT = f"""\
 {APP_NAME}
 {".".join(str(i) for i in VERSION)}
-Copyright (C) 2022 Andy Smith
+Copyright (C) 2024 Andy Smith
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
