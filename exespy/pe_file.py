@@ -76,7 +76,8 @@ class PEFile:
 
     def architecture(self) -> str:
         """Return the architecture of the PE file"""
-        return pefile.MACHINE_TYPE[self.pe.FILE_HEADER.Machine].replace(
+        machine_val = self.pe.FILE_HEADER.Machine
+        return pefile.MACHINE_TYPE.get(machine_val, hex(machine_val)).replace(
             "IMAGE_FILE_MACHINE_", ""
         )
 
